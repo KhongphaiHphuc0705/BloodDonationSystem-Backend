@@ -4,7 +4,6 @@ using Application.DTO.LoginDTO;
 using Application.DTO.Token;
 using Domain.Entities;
 using Infrastructure.Repository.Auth;
-using Infrastructure.Repository.Blood;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -21,7 +20,7 @@ using System.Threading.Tasks;
 namespace Application.Service.Auth
 {
     public class AuthService(IAuthRepository _authRepository, 
-        IBloodRepository _bloodRepository, IConfiguration _configuration, IHttpContextAccessor _httpContext) : IAuthService
+        IConfiguration _configuration, IHttpContextAccessor _httpContext) : IAuthService
     {
         public async Task<LoginResponse> LoginAsync(string phone, string password)
         {
@@ -55,14 +54,12 @@ namespace Application.Service.Auth
                 return null; // User already exists
             }
 
-            var bloodType = await _bloodRepository.GetBloodTypeByNameAsync(userDTO.BloodType);
-
             var user = new User
             {
                 FirstName = userDTO.FirstName,
                 LastName = userDTO.LastName,
                 Phone = userDTO.Phone,
-                BloodTypeId = bloodType.Id,
+                BloodTypeId = userDTO.BloodTypeId,
                 Dob = userDTO.Dob,
                 Gmail = userDTO.Gmail,
                 Gender = userDTO.Gender,
@@ -169,14 +166,13 @@ namespace Application.Service.Auth
             {
                 return null;
             }
-            var bloodType = await _bloodRepository.GetBloodTypeByNameAsync(request.BloodType);
             var hashPassword = new PasswordHasher<User>();
             existUser.HashPass = hashPassword.HashPassword(existUser, request.Password);
 
             existUser.FirstName = request.FirstName;
             existUser.LastName = request.LastName;
             existUser.Phone = request.Phone;
-            existUser.BloodTypeId = bloodType.Id;
+            existUser.BloodTypeId = request.BloodTypeId;
             existUser.Dob = request.Dob;
             existUser.Gender = request.Gender;
             existUser.IsActived = true;

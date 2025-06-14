@@ -2,7 +2,6 @@ using Application.Service.Auth;
 using Infrastructure;
 using Infrastructure.Data;
 using Infrastructure.Repository.Auth;
-using Infrastructure.Repository.Blood;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -13,7 +12,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddScoped<IBloodRepository, BloodRepository>();
 builder.Services.AddScoped<IGoogleService, GoogleService>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();

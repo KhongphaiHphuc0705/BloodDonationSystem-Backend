@@ -1,10 +1,8 @@
 ﻿using Application.DTO;
 using Application.DTO.GoogleDTO;
 using Application.DTO.LoginDTO;
-using Application.DTO.Token;
 using Application.Service.Auth;
 using Domain.Entities;
-using Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

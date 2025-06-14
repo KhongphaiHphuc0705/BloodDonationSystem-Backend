@@ -4,6 +4,7 @@ using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(BloodDonationSystemContext))]
-    partial class BloodDonationSystemContextModelSnapshot : ModelSnapshot
+    [Migration("20250612014827_Init_AddNullable_Registration")]
+    partial class Init_AddNullable_Registration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -138,16 +141,16 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("BloodComponent")
+                    b.Property<int>("BloodComponent")
                         .HasColumnType("int");
 
-                    b.Property<int?>("BloodTypeId")
+                    b.Property<int>("BloodTypeId")
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool?>("IsQualified")
+                    b.Property<bool>("IsQualified")
                         .HasColumnType("bit");
 
                     b.Property<DateTime>("PerformedAt")
@@ -669,7 +672,8 @@ namespace Infrastructure.Migrations
                     b.HasOne("Domain.Entities.BloodType", "BloodType")
                         .WithMany("BloodProcedures")
                         .HasForeignKey("BloodTypeId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("Domain.Entities.User", "PerformedByUser")
                         .WithMany("BloodProcedures")

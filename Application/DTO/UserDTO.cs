@@ -14,7 +14,7 @@ namespace Application.DTO
         public string Phone { get; set; }
         public string Gmail { get; set; }
         public string Password { get; set; }
-        public string BloodType { get; set; }
+        public int? BloodTypeId { get; set; }
         public DateOnly Dob { get; set; }
         public bool Gender { get; set; }
     }
