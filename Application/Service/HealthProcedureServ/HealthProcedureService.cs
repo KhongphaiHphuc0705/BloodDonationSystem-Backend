@@ -3,6 +3,7 @@ using Domain.Entities;
 using Domain.Enums;
 using Infrastructure.Repository.BloodRegistrationRepo;
 using Infrastructure.Repository.HealthProcedureRepo;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,11 +16,14 @@ namespace Application.Service.HealthProcedureServ
     {
         private readonly IHealthProcedureRepository _repo;
         private readonly IBloodRegistrationRepository _repoRegis;
+        private readonly IHttpContextAccessor _contextAccessor;
 
-        public HealthProcedureService(IHealthProcedureRepository repo, IBloodRegistrationRepository repoRegis)
+        public HealthProcedureService(IHealthProcedureRepository repo, IBloodRegistrationRepository repoRegis,
+            IHttpContextAccessor contextAccessor)
         {
             _repo = repo;
             _repoRegis = repoRegis; 
+            _contextAccessor = contextAccessor;
         }
 
         public async Task<HealthProcedure?> RecordHealthProcedureAsync(HealthProcedureRequest request)
@@ -28,6 +32,12 @@ namespace Application.Service.HealthProcedureServ
 
             if (bloodRegistration == null || bloodRegistration.Status != RegistrationStatus.Approved)
                 return null;
+
+            var userId = _contextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
+            if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out Guid creatorId))
+            {
+                throw new UnauthorizedAccessException("User not found or invalid");
+            }
 
             var healthProcedure = new HealthProcedure
             {
@@ -38,9 +48,9 @@ namespace Application.Service.HealthProcedureServ
                 Weight = request.Weight,
                 Height = request.Height,
                 IsHealth = request.IsHealth,
-                PerformedAt = DateTime.UtcNow,
+                PerformedAt = DateTime.Now,
                 Description = request.Description,
-                PerformedBy = request.PerformedBy
+                PerformedBy = creatorId
             };
 
             var healthProcedureAdded = await _repo.AddAsync(healthProcedure);

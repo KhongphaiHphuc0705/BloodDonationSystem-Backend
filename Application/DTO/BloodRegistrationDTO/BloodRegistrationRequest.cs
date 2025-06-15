@@ -15,6 +15,5 @@ namespace Application.DTO.BloodRegistration
         public string? Phone { get; set; }
         public string? Gmail { get; set; }
         public int EventId { get; set; } // Lấy từ giao diện khi nhấn "Đăng ký"
-        public Guid MemberId { get; set; }
     }
 }

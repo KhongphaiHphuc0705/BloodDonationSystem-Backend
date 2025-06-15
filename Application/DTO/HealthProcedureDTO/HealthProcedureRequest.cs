@@ -16,7 +16,6 @@ namespace Application.DTO.HealthProcedureDTO
         public double? Height { get; set; }
         public bool IsHealth { get; set; }
         public string? Description { get; set; }
-        public Guid PerformedBy { get; set; }
         public int BloodRegistrationId { get; set; } // Lấy từ Frontend
     }
 }

@@ -1,15 +1,15 @@
 ﻿using Domain.Entities;
 using Infrastructure.Repository.Base;
 using System;
+
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Infrastructure.Repository.BloodTypeRepo
+namespace Infrastructure.Repository.VolunteerRepo
 {
-    public interface IBloodTypeRepository : IGenericRepository<BloodType>
+    public interface IVolunteerRepository : IGenericRepository<Volunteer>
     {
-        Task<BloodType?> GetBloodTypeByNameAsync(string typeName);
     }
 }

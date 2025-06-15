@@ -1,5 +1,6 @@
 ﻿using Application.DTO.HealthProcedureDTO;
 using Application.Service.HealthProcedureServ;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,6 +17,7 @@ namespace BloodDonationSystem.Controllers
             _service = service;
         }
 
+        [Authorize(Roles = "Staff")]
         [HttpPost("record")]
         public async Task<IActionResult> RecordHealthProcedure([FromBody] HealthProcedureRequest request)
         {

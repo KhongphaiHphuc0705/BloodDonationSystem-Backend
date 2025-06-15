@@ -10,7 +10,6 @@ namespace Application.DTO.BloodProcedureDTO
     {
         public float Volume { get; set; } 
         public string? Description { get; set; } = null;
-        public Guid PerformedBy { get; set; } 
         public int BloodRegistrationId { get; set; }
     }
 }

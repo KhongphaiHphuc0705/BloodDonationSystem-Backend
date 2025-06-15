@@ -1,5 +1,6 @@
 ﻿using Application.DTO.BloodProcedureDTO;
 using Application.Service.BloodProcedureServ;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Cryptography;
@@ -17,6 +18,7 @@ namespace BloodDonationSystem.Controllers
             _service = service;
         }
 
+        [Authorize(Roles = "Staff")]
         [HttpPost("record-blood-collection")]
         public async Task<IActionResult> RecordBloodCollection([FromBody] BloodCollectionRequest request)
         {
@@ -33,6 +35,24 @@ namespace BloodDonationSystem.Controllers
             return Ok(new
             {
                 Message = "Blood collection recorded successfully."
+            });
+        }
+
+        [Authorize(Roles = "Staff")]
+        [HttpPost("record-blood-qualification/{regisId}")]
+        public async Task<IActionResult> RecordBloodQualification(int regisId, [FromBody] RecordBloodQualification request)
+        {
+            var bloodProcedure = await _service.UpdateBloodQualificationAsync(regisId, request);
+
+            if (bloodProcedure == null)
+                return BadRequest(new
+                {
+                    Message = "Failed to record blood qualification."
+                });
+
+            return Ok(new
+            {
+                Message = "Blood qualification recorded successfully."
             });
         }
     }

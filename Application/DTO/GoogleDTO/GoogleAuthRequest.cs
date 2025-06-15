@@ -4,11 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain.Enums
+namespace Application.DTO.GoogleDTO
 {
-    public enum RegistrationStatus
+    public class GoogleAuthRequest
     {
-        Rejected = 0,
-        Approved = 1
+        public string Credential { get; set; }
     }
 }
