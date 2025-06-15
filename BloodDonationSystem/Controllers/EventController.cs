@@ -73,7 +73,7 @@ namespace BloodDonationSystem.Controllers
             return Ok(new
             {
                 Message = "Event updated successfully",
-                Event = eventItem
+                EventDTO = eventItem
             });
         }
 

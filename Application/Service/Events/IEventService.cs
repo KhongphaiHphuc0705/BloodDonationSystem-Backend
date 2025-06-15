@@ -12,7 +12,7 @@ namespace Application.Service.Events
         Task<PaginatedResult<EventDTO>> GetAllEventAsync(int pageNumber, int pageSize);
         Task<Event?> GetEventByIdAsync(int eventId);
 
-        Task<Event> UpdateEventAsync(int eventId, EventDTO updateEvent);
+        Task<EventDTO> UpdateEventAsync(int eventId, EventDTO updateEvent);
 
         Task<Event> DeleteEventAsync(int eventId);
     }
