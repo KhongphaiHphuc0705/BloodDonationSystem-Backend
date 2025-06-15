@@ -20,23 +20,20 @@ namespace Infrastructure.Repository.Events
             return newEvent; // Return the newly added event
         }
 
-        //Tach pagination ra
-        public async Task<PaginatedResult<Event>> GetAllEventAsync(int pageNumber, int pageSize)
+        public async Task<int> CountAllAsync()
         {
-            var totalItems = await _context.Events.CountAsync();
-            var items = await _context.Events
+            var count = await _context.Events.CountAsync();
+            return count; // Return the total count of events
+        }
+
+        //Tach pagination ra
+        public async Task<List<Event>> GetAllEventAsync(int pageNumber, int pageSize)
+        {
+            return await _context.Events
                 .OrderByDescending(e => e.CreateAt)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
-
-            return new PaginatedResult<Event>
-            {
-                Items = items,
-                TotalItems = totalItems,
-                PageNumber = pageNumber,
-                PageSize = pageSize
-            };
         }
 
         public async Task<Event?> GetEventByIdAsync(int eventId)

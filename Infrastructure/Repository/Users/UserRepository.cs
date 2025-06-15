@@ -1,5 +1,6 @@
 ﻿using Domain.Entities;
 using Infrastructure.Data;
+using Infrastructure.Helper;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -16,6 +17,23 @@ namespace Infrastructure.Repository.Users
             return await _context.Users
                 .Where(u => u.Id == id && u.IsActived)
                 .ExecuteUpdateAsync(u => u.SetProperty(x => x.IsActived, false));
+        }
+
+        public async Task<PaginatedResult<User>> GetAllUserAsync(int pageNumber, int pageSize)
+        {
+            var totalItems = await _context.Users.CountAsync();
+            var items = await _context.Users
+                .OrderByDescending(u => u.CreateAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+            return new PaginatedResult<User>
+            {
+                Items = items,
+                TotalItems = totalItems,
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            };
         }
 
         public async Task<User?> GetUserByIdAsync(Guid id)

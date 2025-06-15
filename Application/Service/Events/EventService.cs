@@ -82,13 +82,30 @@ namespace Application.Service.Events
             return existEvent;
         }
 
-        public async Task<PaginatedResult<Event>> GetAllEventAsync(int pageNumber, int pageSize)
+        public async Task<PaginatedResult<EventDTO>> GetAllEventAsync(int pageNumber, int pageSize)
         {
-            if (pageNumber <= 0 || pageSize <= 0)
+            var totalItems = await _eventRepository.CountAllAsync();
+            var events = await _eventRepository.GetAllEventAsync(pageNumber, pageSize);
+
+            var eventDTOs = events.Select(e => new EventDTO
             {
-                throw new ArgumentException("Page number and page size must be greater than zero.");
-            }
-            return await _eventRepository.GetAllEventAsync(pageNumber, pageSize);
+                Title = e.Title,
+                MaxOfDonor = e.MaxOfDonor,
+                EstimatedVolume = e.EstimatedVolume,
+                EventTime = e.EventTime,
+                IsUrgent = e.IsUrgent,
+                IsExpired = e.IsExpired,
+                BloodTypeId = e.BloodTypeId, // Include blood type if available
+                BloodComponent = e.BloodComponent // Include blood component if available
+            }).ToList();
+
+            return new PaginatedResult<EventDTO>
+            {
+                Items = eventDTOs,
+                TotalItems = totalItems,
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            };
         }
 
         public Task<Event?> GetEventByIdAsync(int eventId)

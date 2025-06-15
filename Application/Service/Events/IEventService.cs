@@ -9,7 +9,7 @@ namespace Application.Service.Events
         Task<Event?> AddEventAsync(EventDTO eventRequest);
         Task<Event?> AddUrgentEventAsync(EventDTO eventRequest);
 
-        Task<PaginatedResult<Event>> GetAllEventAsync(int pageNumber, int pageSize);
+        Task<PaginatedResult<EventDTO>> GetAllEventAsync(int pageNumber, int pageSize);
         Task<Event?> GetEventByIdAsync(int eventId);
 
         Task<Event> UpdateEventAsync(int eventId, EventDTO updateEvent);

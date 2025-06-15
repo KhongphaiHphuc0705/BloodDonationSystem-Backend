@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Application.DTO;
+using Domain.Entities;
+using Infrastructure.Helper;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +11,10 @@ namespace Application.Service.Users
 {
     public interface IUserService
     {
+    
+        Task<PaginatedResult<User>> GetAllUserAsync(int pageNumber, int pageSize);
+
         Task<bool> DeactiveUserAsync(Guid userId);
+        Task<User> AddStaffAsync (UserDTO request);
     }
 }

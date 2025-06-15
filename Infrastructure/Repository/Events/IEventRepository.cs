@@ -12,7 +12,9 @@ namespace Infrastructure.Repository.Events
     {
         Task<Event?> AddEventAsync(Event newEvent);
 
-        Task<PaginatedResult<Event>> GetAllEventAsync(int pageNumber, int pageSize);
+        Task<int> CountAllAsync();
+
+        Task<List<Event>> GetAllEventAsync(int pageNumber, int pageSize);
         Task<Event?> GetEventByIdAsync(int eventId);
 
         Task<Event> UpdateEventAsync(Event updateEvent);

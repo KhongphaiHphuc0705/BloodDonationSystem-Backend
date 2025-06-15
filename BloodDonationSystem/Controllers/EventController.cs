@@ -50,7 +50,7 @@ namespace BloodDonationSystem.Controllers
             });
         }
 
-        [HttpGet]
+        [HttpGet("get-all")]
         public async Task<IActionResult> GetAllEvents([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
             var events = await _eventService.GetAllEventAsync(pageNumber, pageSize);
