@@ -19,21 +19,18 @@ namespace Infrastructure.Repository.Users
                 .ExecuteUpdateAsync(u => u.SetProperty(x => x.IsActived, false));
         }
 
-        public async Task<PaginatedResult<User>> GetAllUserAsync(int pageNumber, int pageSize)
+        public async Task<int> CountAllAsync()
         {
-            var totalItems = await _context.Users.CountAsync();
-            var items = await _context.Users
+            return await _context.Users.CountAsync();
+        }
+
+        public async Task<List<User>> GetAllUserAsync(int pageNumber, int pageSize)
+        {
+            return await _context.Users
                 .OrderByDescending(u => u.CreateAt)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
-            return new PaginatedResult<User>
-            {
-                Items = items,
-                TotalItems = totalItems,
-                PageNumber = pageNumber,
-                PageSize = pageSize
-            };
         }
 
         public async Task<User?> GetUserByIdAsync(Guid id)

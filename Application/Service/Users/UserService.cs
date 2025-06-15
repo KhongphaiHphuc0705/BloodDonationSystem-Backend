@@ -1,14 +1,9 @@
-﻿using Application.DTO;
+﻿using Application.DTO.UserDTO;
 using Domain.Entities;
 using Infrastructure.Helper;
 using Infrastructure.Repository.Auth;
 using Infrastructure.Repository.Users;
 using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application.Service.Users
 {
@@ -53,14 +48,27 @@ namespace Application.Service.Users
             return deactiveUser > 0;
         }
 
-        public async Task<PaginatedResult<User>> GetAllUserAsync(int pageNumber, int pageSize)
+        public async Task<PaginatedResult<ListUserDTO>> GetAllUserAsync(int pageNumber, int pageSize)
         {
-            if (pageNumber <= 0 || pageSize <= 0)
-            {
-                throw new ArgumentException("Page number and page size must be greater than zero.");
-            }
+            var totalItems = await _userRepository.CountAllAsync();
+            var users = await _userRepository.GetAllUserAsync(pageNumber, pageSize);
 
-            return await _userRepository.GetAllUserAsync(pageNumber, pageSize);
+            var userDtos = users.Select(u => new ListUserDTO
+            {
+                Name = $"{u.FirstName} {u.LastName}",
+                Email = u.Gmail,
+                Status = u.IsActived,
+                Dob = u.Dob,
+
+            }).ToList();
+
+            return new PaginatedResult<ListUserDTO>
+            {
+                Items = userDtos,
+                TotalItems = totalItems,
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            };
         }
     }
 }

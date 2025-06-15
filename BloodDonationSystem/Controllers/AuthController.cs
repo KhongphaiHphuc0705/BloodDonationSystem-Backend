@@ -2,6 +2,7 @@
 using Application.DTO.GoogleDTO;
 using Application.DTO.LoginDTO;
 using Application.DTO.Token;
+using Application.DTO.UserDTO;
 using Application.Service.Auth;
 using Domain.Entities;
 using Infrastructure.Data;
