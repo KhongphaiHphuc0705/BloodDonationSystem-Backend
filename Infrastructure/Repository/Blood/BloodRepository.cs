@@ -11,6 +11,11 @@ namespace Infrastructure.Repository.Blood
 {
     public class BloodRepository (BloodDonationSystemContext _context) : IBloodRepository
     {
+        public async Task<BloodType?> GetBloodTypeByIdAsync(int? id)
+        {
+            return await _context.BloodTypes.FirstOrDefaultAsync(b => b.Id == id);
+        }
+
         public async Task<BloodType?> GetBloodTypeByNameAsync(string name)
         {
             return await _context.BloodTypes.FirstOrDefaultAsync(b => b.Type.ToUpper() == name.ToUpper());

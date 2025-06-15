@@ -2,6 +2,7 @@
 using Domain.Entities;
 using Infrastructure.Helper;
 using Infrastructure.Repository.Auth;
+using Infrastructure.Repository.Blood;
 using Infrastructure.Repository.Users;
 using Microsoft.AspNetCore.Http;
 
@@ -9,7 +10,8 @@ namespace Application.Service.Users
 {
     public class UserService(IUserRepository _userRepository,
                              IAuthRepository _authRepository,
-                             IHttpContextAccessor _contextAccessor) : IUserService
+                             IHttpContextAccessor _contextAccessor,
+                             IBloodRepository _bloodRepository) : IUserService
     {
         public async Task<User> AddStaffAsync(UserDTO request)
         {
@@ -55,7 +57,7 @@ namespace Application.Service.Users
 
             var userDtos = users.Select(u => new ListUserDTO
             {
-                Name = $"{u.FirstName} {u.LastName}",
+                Name = $"{u.LastName} {u.FirstName}",
                 Email = u.Gmail,
                 Status = u.IsActived,
                 Dob = u.Dob,
@@ -68,6 +70,35 @@ namespace Application.Service.Users
                 TotalItems = totalItems,
                 PageNumber = pageNumber,
                 PageSize = pageSize
+            };
+        }
+
+        public async Task<ProfileDTO?> GetUserByIdAsync(Guid userId)
+        {
+            var id = _contextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
+            if (id == null || !Guid.TryParse(id, out Guid parsedUserId) || parsedUserId != userId)
+            {
+                // Log or handle the case where the user ID is invalid or does not match
+                return null; // Unauthorized access or invalid user ID
+            }
+
+            var user = await _userRepository.GetUserByIdAsync(userId);
+            if (user == null)
+            {
+                // Log or handle the case where the user was not found
+                return null; // User not found
+            }
+
+            var bloodType = await _bloodRepository.GetBloodTypeByIdAsync(user.BloodTypeId);
+
+            return new ProfileDTO
+            {
+                Name = $"{user.LastName} {user.FirstName}",
+                Phone = user.Phone,
+                Gmail = user.Gmail,
+                Gender = user.Gender,
+                Dob = user.Dob,
+                BloodType = bloodType.Type
             };
         }
     }

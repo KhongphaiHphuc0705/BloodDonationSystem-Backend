@@ -11,7 +11,7 @@ namespace Application.Service.Users
 {
     public interface IUserService
     {
-    
+        Task<ProfileDTO?> GetUserByIdAsync(Guid userId);
         Task<PaginatedResult<ListUserDTO>> GetAllUserAsync(int pageNumber, int pageSize);
 
         Task<bool> DeactiveUserAsync(Guid userId);
