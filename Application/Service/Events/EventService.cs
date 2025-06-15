@@ -119,7 +119,7 @@ namespace Application.Service.Events
             return eventItem;
         }
 
-        public async Task<Event> UpdateEventAsync(int eventId, EventDTO updateEvent)
+        public async Task<EventDTO> UpdateEventAsync(int eventId, EventDTO updateEvent)
         {
             var userId = _contextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
             if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out Guid updaterId))
@@ -143,7 +143,17 @@ namespace Application.Service.Events
             existEvent.UpdateBy = updaterId; // Set the updater ID
 
             await _eventRepository.UpdateEventAsync(existEvent);
-            return existEvent; // Return the updated event
+            return new EventDTO
+            {
+                Title = existEvent.Title,
+                MaxOfDonor = existEvent.MaxOfDonor,
+                EstimatedVolume = existEvent.EstimatedVolume,
+                EventTime = existEvent.EventTime,
+                IsUrgent = existEvent.IsUrgent,
+                IsExpired = existEvent.IsExpired,
+                BloodTypeId = existEvent.BloodTypeId, // Include blood type if available
+                BloodComponent = existEvent.BloodComponent // Include blood component if available
+            };
         }
     }
 }
