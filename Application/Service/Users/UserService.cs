@@ -101,5 +101,40 @@ namespace Application.Service.Users
                 BloodType = bloodType.Type
             };
         }
+
+        public async Task<ProfileDTO> UpdateUserProfileAsync(Guid userId, UserDTO updateUser)
+        {
+            var id = _contextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
+            if (id == null || !Guid.TryParse(id, out Guid parsedUserId) || parsedUserId != userId)
+            {
+                // Log or handle the case where the user ID is invalid or does not match
+                return null; // Unauthorized access or invalid user ID
+            }
+
+            var existingUser = await _userRepository.GetUserByIdAsync(userId);
+           // var bloodType = await _bloodRepository.GetBloodTypeByNameAsync(updateUser.BloodTypeId);
+
+            existingUser.FirstName = updateUser.FirstName;
+            existingUser.LastName = updateUser.LastName;
+            existingUser.Phone = updateUser.Phone;
+            existingUser.Gmail = updateUser.Gmail;
+            existingUser.Gender = updateUser.Gender;
+            existingUser.Dob = updateUser.Dob;
+            existingUser.BloodTypeId = updateUser.BloodTypeId;
+
+            var bloodType = await _bloodRepository.GetBloodTypeByIdAsync(updateUser.BloodTypeId);
+
+            var updatedUser = await _userRepository.UpdateUserProfileAsync(existingUser);
+
+            return new ProfileDTO
+            {
+                Name = $"{existingUser.LastName} {existingUser.FirstName}",
+                Phone = existingUser.Phone,
+                Gmail = existingUser.Gmail,
+                Gender = existingUser.Gender,
+                Dob = existingUser.Dob,
+                BloodType = bloodType.Type
+            };
+        }
     }
 }

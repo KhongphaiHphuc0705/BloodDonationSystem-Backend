@@ -69,5 +69,26 @@ namespace BloodDonationSystem.Controllers
             }
             return Ok(profile);
         }
+
+        [Authorize]
+        [HttpPut("update-profile")]
+        public async Task<IActionResult> UpdateUserProfile([FromBody] UserDTO profileDto)
+        {
+            if (profileDto == null)
+            {
+                return BadRequest("Invalid profile data.");
+            }
+            var userId = User.FindFirst("UserId")?.Value;
+            if (userId == null)
+            {
+                return Unauthorized("User not authenticated.");
+            }
+            var updatedProfile = await _userService.UpdateUserProfileAsync(Guid.Parse(userId), profileDto);
+            if (updatedProfile == null)
+            {
+                return NotFound("User profile not found or update failed.");
+            }
+            return Ok(updatedProfile);
+        }
     }
 }

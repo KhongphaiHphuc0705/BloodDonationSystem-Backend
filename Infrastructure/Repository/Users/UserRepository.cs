@@ -38,5 +38,12 @@ namespace Infrastructure.Repository.Users
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
             return user;
         }
+
+        public async Task<User?> UpdateUserProfileAsync(User updateUser)
+        {
+            _context.Users.Update(updateUser);
+            await _context.SaveChangesAsync();
+            return updateUser;
+        }
     }
 }
