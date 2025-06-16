@@ -3,12 +3,12 @@ using Application.DTO.GoogleDTO;
 using Application.DTO.LoginDTO;
 using Application.Service.Auth;
 using Domain.Entities;
-using Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net.Http;
 using System.Runtime.ExceptionServices;
 using System.Text;
 
@@ -17,7 +17,7 @@ namespace BloodDonationSystem.Controllers
     [Route("api/[controller]")]
     [ApiController]
     public class AuthController(IAuthService _authService, IConfiguration _configuration,
-                                IGoogleService _googleService) : ControllerBase
+                                IGoogleService _googleService, IHttpContextAccessor _httpContextAccessor) : ControllerBase
     {
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
@@ -27,6 +27,7 @@ namespace BloodDonationSystem.Controllers
             {
                 return Unauthorized(response.Message);
             }
+
             return Ok(new
             {
                 response.IsSuccess,
@@ -37,6 +38,7 @@ namespace BloodDonationSystem.Controllers
                 response.LastName
             });
         }
+
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] UserDTO request)
         {
@@ -61,6 +63,21 @@ namespace BloodDonationSystem.Controllers
             var name = payload.Name;
 
             var user = await _authService.GetUserByEmailAsync(email);
+            if (user != null && user.IsActived)
+            {
+                // User already exists, generate token
+                var token = _authService.GenerateToken(user);
+                SetRefreshTokenCookie(token.RefreshToken); // Set the refresh token in a secure cookie
+                return Ok(new
+                {
+                    Message = "Login successful",
+                    Gmail = email,
+                    Name = name,
+                    Token = token.AccessToken,
+                    IsActived = true
+                });
+            }
+
             if (user == null)
             {
                 var nameParts = name?.Split(' ', 2);
@@ -104,9 +121,20 @@ namespace BloodDonationSystem.Controllers
         }
 
 
-        [HttpPost("renew-token")]
-        public async Task<IActionResult> RenewToken(TokenModel tokenModel)
+
+        [HttpPost("refresh-token")]
+        public async Task<IActionResult> RenewToken()
         {
+            var refreshToken = _httpContextAccessor.HttpContext?.Request.Cookies["RefreshToken"];
+            if (string.IsNullOrEmpty(refreshToken))
+            {
+                return BadRequest(new ApiResponse
+                {
+                    Success = false,
+                    Message = "Refresh token not found"
+                });
+            }
+
             var jwtTokenHandler = new JwtSecurityTokenHandler();
             var secretKey = _configuration["AppSettings:SecretKey"]; // Replace with your actual secret key
             var secretKeyByte = Encoding.UTF8.GetBytes(secretKey); // Replace with your actual secret key
@@ -125,7 +153,8 @@ namespace BloodDonationSystem.Controllers
             {
                 //Check1: Access token valid format
                 var tokenInvalidate = jwtTokenHandler.
-                    ValidateToken(tokenModel.AccessToken, tokenValidateParam, out var validatedToken);
+                    ValidateToken(_httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", ""),
+                    tokenValidateParam, out var validatedToken);
 
                 //Check2: Check alg
                 if(validatedToken is JwtSecurityToken jwtSecurityToken)
@@ -158,7 +187,7 @@ namespace BloodDonationSystem.Controllers
                 }
 
                 //Check4: Check refreshToken in db
-                var storageToken = await _authService.GetRefreshTokenAsync(tokenModel.RefreshToken);
+                var storageToken = await _authService.GetRefreshTokenAsync(refreshToken);
                 if (storageToken is null)
                 {
                     return Ok(new ApiResponse
@@ -168,9 +197,45 @@ namespace BloodDonationSystem.Controllers
                     });
                 }
 
+                //Check5: Check if refresh token is used/revoked?
+                if(storageToken.IsUsed)
+                {
+                    return Ok(new ApiResponse
+                    {
+                        Success = false,
+                        Message = "Refresh token is used"
+                    });
+                }
+
+                if(storageToken.IsRevoked)
+                {
+                    return Ok(new ApiResponse
+                    {
+                        Success = false,
+                        Message = "Refresh token is revoked"
+                    });
+                }
+
+                //Check6: Check if id of access token == jwt id refresh token match
+                var jti = tokenInvalidate.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Jti).Value;
+                if (storageToken.JwtId != jti)
+                {
+                    return Ok(new ApiResponse
+                    {
+                        Success = false,
+                        Message = "Token is not match"
+                    });
+                }
+
+                storageToken.IsUsed = true; // Mark the refresh token as used
+                storageToken.IsRevoked = true; // Mark the refresh token as revoked
+                storageToken.ExpiredAt = DateTime.UtcNow; // Set the expiration date to now
+                await _authService.UpdateRefreshTokenAsync(storageToken); // Update the refresh token in the database
+
                 //Create new token
-                var token = _authService.GenerateToken(storageToken.User);
-                return Ok(token);
+                var newToken = _authService.GenerateToken(storageToken.User);
+                SetRefreshTokenCookie(newToken.RefreshToken);
+                return Ok(newToken.AccessToken);
             }
             catch (Exception ex)
             {
@@ -180,6 +245,18 @@ namespace BloodDonationSystem.Controllers
                     Message = "Something went wrong"
                 });
             }
+        }
+
+        private void SetRefreshTokenCookie(string refreshToken)
+        {
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true, // Prevents JavaScript access to the cookie
+                Secure = true, // Use HTTPS in production
+                Expires = DateTime.UtcNow.AddDays(7), // Set expiration for the cookie
+                SameSite = SameSiteMode.Strict // Prevent CSRF attacks
+            };
+            _httpContextAccessor.HttpContext.Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
         }
 
         private DateTime ConvertUnixToDateTime(long utcExpireDate) //Chuyen unix thanh date time

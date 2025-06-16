@@ -138,16 +138,16 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("BloodComponent")
+                    b.Property<int?>("BloodComponent")
                         .HasColumnType("int");
 
-                    b.Property<int>("BloodTypeId")
+                    b.Property<int?>("BloodTypeId")
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsQualified")
+                    b.Property<bool?>("IsQualified")
                         .HasColumnType("bit");
 
                     b.Property<DateTime>("PerformedAt")
@@ -669,8 +669,7 @@ namespace Infrastructure.Migrations
                     b.HasOne("Domain.Entities.BloodType", "BloodType")
                         .WithMany("BloodProcedures")
                         .HasForeignKey("BloodTypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Domain.Entities.User", "PerformedByUser")
                         .WithMany("BloodProcedures")
