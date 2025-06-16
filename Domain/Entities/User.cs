@@ -1,3 +1,4 @@
+using Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -26,7 +27,7 @@ public class User
     public DateTime? UpdateAt { get; set; }
 
     public DateTime? LastDonation { get; set; }
-    public bool IsActived { get; set; }
+    public AccountStatus Status { get; set; }
 
     public decimal? Longitude { get; set; }
     public decimal? Latitude { get; set; }

@@ -17,7 +17,7 @@ public class Event
     public double EstimatedVolume { get; set; }
     public DateTime CreateAt { get; set; }
     public DateTime? UpdateAt { get; set; }
-    public DateTime EventTime { get; set; }
+    public DateOnly EventTime { get; set; }
     public bool IsUrgent { get; set; }
     public bool IsExpired { get; set; }
 

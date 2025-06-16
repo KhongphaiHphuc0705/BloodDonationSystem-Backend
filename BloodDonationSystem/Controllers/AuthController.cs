@@ -3,6 +3,7 @@ using Application.DTO.GoogleDTO;
 using Application.DTO.LoginDTO;
 using Application.Service.Auth;
 using Domain.Entities;
+using Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -63,7 +64,7 @@ namespace BloodDonationSystem.Controllers
             var name = payload.Name;
 
             var user = await _authService.GetUserByEmailAsync(email);
-            if (user != null && user.IsActived)
+            if (user != null)
             {
                 // User already exists, generate token
                 var token = _authService.GenerateToken(user);
@@ -73,8 +74,7 @@ namespace BloodDonationSystem.Controllers
                     Message = "Login successful",
                     Gmail = email,
                     Name = name,
-                    Token = token.AccessToken,
-                    IsActived = true
+                    Token = token.AccessToken
                 });
             }
 
@@ -89,7 +89,7 @@ namespace BloodDonationSystem.Controllers
                     FirstName = firstName,
                     LastName = lastName,
                     Gmail = email,
-                    IsActived = false, //Cannot use yet
+                    Status = AccountStatus.Pending, //Cannot use yet
                     RoleId = 3 // Assuming 3 is the default role ID for a user
                 };
                 await _authService.RegisterWithGoogleAsync(user);
