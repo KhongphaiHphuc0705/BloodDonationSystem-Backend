@@ -6,8 +6,8 @@ namespace Application.Service.Events
 {
     public interface IEventService
     {
-        Task<Event?> AddEventAsync(EventDTO eventRequest);
-        Task<Event?> AddUrgentEventAsync(EventDTO eventRequest);
+        Task<Event?> AddEventAsync(NormalEventDTO eventRequest);
+        Task<Event?> AddUrgentEventAsync(UrgentEventDTO eventRequest);
 
         Task<PaginatedResult<EventDTO>> GetAllEventAsync(int pageNumber, int pageSize);
         Task<Event?> GetEventByIdAsync(int eventId);

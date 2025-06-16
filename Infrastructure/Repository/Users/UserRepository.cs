@@ -1,4 +1,5 @@
 ﻿using Domain.Entities;
+using Domain.Enums;
 using Infrastructure.Data;
 using Infrastructure.Helper;
 using Microsoft.EntityFrameworkCore;
@@ -15,8 +16,8 @@ namespace Infrastructure.Repository.Users
         public async Task<int> DeactiveUserAsync(Guid id)
         {
             return await _context.Users
-                .Where(u => u.Id == id && u.IsActived)
-                .ExecuteUpdateAsync(u => u.SetProperty(x => x.IsActived, false));
+                .Where(u => u.Id == id && u.Status == AccountStatus.Active)
+                .ExecuteUpdateAsync(u => u.SetProperty(x => x.Status, AccountStatus.Inactive));
         }
 
         public async Task<PaginatedResult<User>> GetAllUserAsync(int pageNumber, int pageSize)
