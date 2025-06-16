@@ -28,7 +28,7 @@ namespace Infrastructure.Repository.Events
 
         //Tach pagination ra
         public async Task<List<Event>> GetAllEventAsync(int pageNumber, int pageSize)
-        {
+    {
             return await _context.Events
                 .OrderByDescending(e => e.CreateAt)
                 .Skip((pageNumber - 1) * pageSize)

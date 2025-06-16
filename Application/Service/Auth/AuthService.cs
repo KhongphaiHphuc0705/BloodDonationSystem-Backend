@@ -3,14 +3,12 @@ using Application.DTO.GoogleDTO;
 using Application.DTO.LoginDTO;
 using Application.DTO.Token;
 using Domain.Entities;
+using Domain.Enums;
 using Infrastructure.Repository.Auth;
-using Infrastructure.Repository.Blood;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
@@ -21,7 +19,7 @@ using System.Threading.Tasks;
 namespace Application.Service.Auth
 {
     public class AuthService(IAuthRepository _authRepository, 
-        IBloodRepository _bloodRepository, IConfiguration _configuration, IHttpContextAccessor _httpContext) : IAuthService
+        IConfiguration _configuration, IHttpContextAccessor _httpContext) : IAuthService
     {
         public async Task<LoginResponse> LoginAsync(string phone, string password)
         {
@@ -61,9 +59,12 @@ namespace Application.Service.Auth
                 LastName = userDTO.LastName,
                 Phone = userDTO.Phone,
                 BloodTypeId = userDTO.BloodTypeId,
+                Longitude = userDTO.Longitude,
+                Latitude = userDTO.Latitude,
                 Dob = userDTO.Dob,
                 Gmail = userDTO.Gmail,
                 Gender = userDTO.Gender,
+                Status = AccountStatus.Active,
                 RoleId = 3, // Assuming 3 is the default role ID for a user
             };
 
@@ -75,7 +76,6 @@ namespace Application.Service.Auth
         }
 
         
-
         public TokenModel GenerateToken(User user)
         {
             var jwtTokenHandler = new JwtSecurityTokenHandler();
@@ -84,14 +84,14 @@ namespace Application.Service.Auth
             {
                 Subject = new ClaimsIdentity(new[]
                 {
-                    new Claim("UserId", user.Id.ToString()), //User ID
+                    new Claim("UserId", user.Id.ToString()),  // Thêm UserId vào trong Token
                     new Claim(ClaimTypes.Name, user.FirstName + " " + user.LastName),
                     new Claim(JwtRegisteredClaimNames.Sub, user.Phone),
                     new Claim(JwtRegisteredClaimNames.Email, user.Gmail),
                     new Claim(ClaimTypes.Role, user.Role.RoleName),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
                 }), //Config token tra ra cai gi
-                Expires = DateTime.UtcNow.AddMinutes(1), //Token expires in 1 min to test
+                Expires = DateTime.UtcNow.AddMinutes(60), //Token expires in 1 min to test
                 SigningCredentials = new SigningCredentials(
                     new SymmetricSecurityKey(secretKeyByte), //Secret key
                     SecurityAlgorithms.HmacSha256)
@@ -168,17 +168,16 @@ namespace Application.Service.Auth
             {
                 return null;
             }
-            var bloodType = await _bloodRepository.GetBloodTypeByNameAsync(request.BloodType);
             var hashPassword = new PasswordHasher<User>();
             existUser.HashPass = hashPassword.HashPassword(existUser, request.Password);
 
             existUser.FirstName = request.FirstName;
             existUser.LastName = request.LastName;
             existUser.Phone = request.Phone;
-            existUser.BloodTypeId = bloodType.Id;
+            existUser.BloodTypeId = request.BloodTypeId;
             existUser.Dob = request.Dob;
             existUser.Gender = request.Gender;
-            existUser.IsActived = true;
+            existUser.Status = AccountStatus.Active;
 
             await _authRepository.UpdateGoogleLogin(existUser);
             return existUser;

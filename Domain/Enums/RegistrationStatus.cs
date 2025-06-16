@@ -8,7 +8,7 @@ namespace Domain.Enums
 {
     public enum RegistrationStatus
     {
-        Approved = 0,
-        Rejected = 1
+        Rejected = 0,
+        Approved = 1
     }
 }
