@@ -16,7 +16,7 @@ namespace Application.DTO
         public string Password { get; set; }
         public decimal Longitude { get; set; }
         public decimal Latitude { get; set; }
-        public string BloodType { get; set; }
+        public int BloodType { get; set; }
         public DateOnly Dob { get; set; }
         public bool Gender { get; set; }
     }

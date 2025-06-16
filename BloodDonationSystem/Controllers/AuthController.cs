@@ -67,12 +67,13 @@ namespace BloodDonationSystem.Controllers
             {
                 // User already exists, generate token
                 var token = _authService.GenerateToken(user);
+                SetRefreshTokenCookie(token.RefreshToken); // Set the refresh token in a secure cookie
                 return Ok(new
                 {
                     Message = "Login successful",
                     Gmail = email,
                     Name = name,
-                    Token = token,
+                    Token = token.AccessToken,
                     IsActived = true
                 });
             }
