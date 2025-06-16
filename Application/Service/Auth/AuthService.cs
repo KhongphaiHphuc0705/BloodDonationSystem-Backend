@@ -55,17 +55,20 @@ namespace Application.Service.Auth
                 return null; // User already exists
             }
 
-            var bloodType = await _bloodRepository.GetBloodTypeByNameAsync(userDTO.BloodType);
+            //var bloodType = await _bloodRepository.GetBloodTypeByNameAsync(userDTO.BloodType);
 
             var user = new User
             {
                 FirstName = userDTO.FirstName,
                 LastName = userDTO.LastName,
                 Phone = userDTO.Phone,
-                BloodTypeId = bloodType.Id,
+                BloodTypeId = userDTO.BloodType,
+                Longitude = userDTO.Longitude,
+                Latitude = userDTO.Latitude,
                 Dob = userDTO.Dob,
                 Gmail = userDTO.Gmail,
                 Gender = userDTO.Gender,
+                IsActived = true,
                 RoleId = 3, // Assuming 3 is the default role ID for a user
             };
 
@@ -86,6 +89,7 @@ namespace Application.Service.Auth
             {
                 Subject = new ClaimsIdentity(new[]
                 {
+                    new Claim("UserId", user.Id.ToString()), //User ID
                     new Claim(ClaimTypes.Name, user.FirstName + " " + user.LastName),
                     new Claim(JwtRegisteredClaimNames.Sub, user.Phone),
                     new Claim(JwtRegisteredClaimNames.Email, user.Gmail),
