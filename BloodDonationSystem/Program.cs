@@ -1,9 +1,14 @@
-using Application.Service.BloodRegistrationServ;
+using Application.Service.Auth;
+using Application.Service.Events;
+using Application.Service.Users;
+using Infrastructure;
 using Infrastructure.Data;
 using Infrastructure.Repository.BloodRegistrationRepo;
 using Infrastructure.Repository.HealthProcedureRepo;
 using Application.Service.HealthProcedureServ;
 using Infrastructure.Repository.Auth;
+using Infrastructure.Repository.Events;
+using Infrastructure.Repository.Users;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -17,7 +22,6 @@ using Infrastructure.Repository.Auth;
 using Infrastructure.Repository.VolunteerRepo;
 using Application.DTO.SendEmailDTO;
 using Application.Service.EmailServ;
-using Infrastructure.Repository.UserRepo;
 using Infrastructure.Repository.Events;
 using Infrastructure.Repository.Facilities;
 
@@ -30,17 +34,18 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IGoogleService, GoogleService>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IEventRepository, EventRepository>();
+builder.Services.AddScoped<IEventService, EventService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddScoped<IBloodRegistrationRepository, BloodRegistrationRepository>();
-builder.Services.AddScoped<IBloodRegistrationService, BloodRegistrationService>();
 builder.Services.AddScoped<IHealthProcedureRepository, HealthProcedureRepository>();
 builder.Services.AddScoped<IHealthProcedureService, HealthProcedureService>();
 builder.Services.AddScoped<IBloodProcedureRepository, BloodProcedureRepository>();
 builder.Services.AddScoped<IBloodProcedureService, BloodProcedureService>();
 builder.Services.AddScoped<IBloodInventoryRepository, BloodInventoryRepository>();
 builder.Services.AddScoped<IVolunteerRepository,VolunteerRepository>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IEventRepository, EventRepository>();
 builder.Services.AddScoped<IFacilityRepository, FacilityRepository>();
 
 // Add configuration for email service

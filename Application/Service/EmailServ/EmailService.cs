@@ -2,7 +2,7 @@
 using Domain.Entities;
 using Infrastructure.Repository.Events;
 using Infrastructure.Repository.Facilities;
-using Infrastructure.Repository.UserRepo;
+using Infrastructure.Repository.Users;
 using MailKit.Net.Smtp;
 using Microsoft.Extensions.Options;
 using MimeKit;
@@ -90,8 +90,8 @@ namespace Application.Service.EmailServ
 
         private async Task<(User member, Event eventObj, Facility facility)> GetNecessariesForSendEmail(BloodRegistration bloodRegistration)
         {
-            var member = await _repoUser.GetByIdAsync(bloodRegistration.MemberId);
-            var eventObj = await _repoEvent.GetByIdAsync(bloodRegistration.EventId);
+            var member = await _repoUser.GetUserByIdAsync(bloodRegistration.MemberId);
+            var eventObj = await _repoEvent.GetEventByIdAsync(bloodRegistration.EventId);
             var facility = await _repoFacil.GetByIdAsync(eventObj.FacilityId);
 
             return (member, eventObj, facility);

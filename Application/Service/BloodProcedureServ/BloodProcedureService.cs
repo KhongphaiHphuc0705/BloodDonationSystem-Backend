@@ -8,7 +8,6 @@ using Infrastructure.Repository.BloodRegistrationRepo;
 using Infrastructure.Repository.Events;
 using Infrastructure.Repository.Facilities;
 using Infrastructure.Repository.HealthProcedureRepo;
-using Infrastructure.Repository.UserRepo;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
