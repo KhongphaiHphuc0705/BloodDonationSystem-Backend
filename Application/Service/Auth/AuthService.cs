@@ -3,13 +3,12 @@ using Application.DTO.GoogleDTO;
 using Application.DTO.LoginDTO;
 using Application.DTO.Token;
 using Domain.Entities;
+using Domain.Enums;
 using Infrastructure.Repository.Auth;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
@@ -65,7 +64,7 @@ namespace Application.Service.Auth
                 Dob = userDTO.Dob,
                 Gmail = userDTO.Gmail,
                 Gender = userDTO.Gender,
-                IsActived = true,
+                Status = AccountStatus.Active,
                 RoleId = 3, // Assuming 3 is the default role ID for a user
             };
 
@@ -178,7 +177,7 @@ namespace Application.Service.Auth
             existUser.BloodTypeId = request.BloodTypeId;
             existUser.Dob = request.Dob;
             existUser.Gender = request.Gender;
-            existUser.IsActived = true;
+            existUser.Status = AccountStatus.Active;
 
             await _authRepository.UpdateGoogleLogin(existUser);
             return existUser;
