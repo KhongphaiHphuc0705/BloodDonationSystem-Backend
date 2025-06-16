@@ -61,6 +61,21 @@ namespace BloodDonationSystem.Controllers
             var name = payload.Name;
 
             var user = await _authService.GetUserByEmailAsync(email);
+            if (user != null && user.IsActived)
+            {
+                // User already exists, generate token
+                var token = _authService.GenerateToken(user);
+                SetRefreshTokenCookie(token.RefreshToken); // Set the refresh token in a secure cookie
+                return Ok(new
+                {
+                    Message = "Login successful",
+                    Gmail = email,
+                    Name = name,
+                    Token = token.AccessToken,
+                    IsActived = true
+                });
+            }
+
             if (user == null)
             {
                 var nameParts = name?.Split(' ', 2);
@@ -104,7 +119,7 @@ namespace BloodDonationSystem.Controllers
         }
 
 
-        [HttpPost("renew-token")]
+        [HttpPost("refresh-token")]
         public async Task<IActionResult> RenewToken()
         {
             var refreshToken = _httpContextAccessor.HttpContext?.Request.Cookies["RefreshToken"];

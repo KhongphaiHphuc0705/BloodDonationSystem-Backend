@@ -60,9 +60,12 @@ namespace Application.Service.Auth
                 LastName = userDTO.LastName,
                 Phone = userDTO.Phone,
                 BloodTypeId = userDTO.BloodTypeId,
+                Longitude = userDTO.Longitude,
+                Latitude = userDTO.Latitude,
                 Dob = userDTO.Dob,
                 Gmail = userDTO.Gmail,
                 Gender = userDTO.Gender,
+                IsActived = true,
                 RoleId = 3, // Assuming 3 is the default role ID for a user
             };
 
@@ -83,6 +86,7 @@ namespace Application.Service.Auth
             {
                 Subject = new ClaimsIdentity(new[]
                 {
+                    new Claim("UserId", user.Id.ToString()), //User ID
                     new Claim(ClaimTypes.Name, user.FirstName + " " + user.LastName),
                     new Claim(JwtRegisteredClaimNames.Sub, user.Phone),
                     new Claim(JwtRegisteredClaimNames.Email, user.Gmail),
