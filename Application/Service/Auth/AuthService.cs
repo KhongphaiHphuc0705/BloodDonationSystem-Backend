@@ -60,6 +60,8 @@ namespace Application.Service.Auth
                 LastName = userDTO.LastName,
                 Phone = userDTO.Phone,
                 BloodTypeId = userDTO.BloodTypeId,
+                Longitude = userDTO.Longitude,
+                Latitude = userDTO.Latitude,
                 Dob = userDTO.Dob,
                 Gmail = userDTO.Gmail,
                 Gender = userDTO.Gender,

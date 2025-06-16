@@ -3,6 +3,7 @@ using Infrastructure.Data;
 using Infrastructure.Repository.BloodRegistrationRepo;
 using Infrastructure.Repository.HealthProcedureRepo;
 using Application.Service.HealthProcedureServ;
+using Infrastructure.Repository.Auth;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -23,6 +24,7 @@ using Infrastructure.Repository.Facilities;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddHttpContextAccessor();
+
 
 //Dependency Injection (DI) for donation
 builder.Services.AddScoped<IGoogleService, GoogleService>();
