@@ -27,6 +27,7 @@ namespace BloodDonationSystem.Controllers
             {
                 return Unauthorized(response.Message);
             }
+
             return Ok(new
             {
                 response.IsSuccess,
@@ -37,6 +38,7 @@ namespace BloodDonationSystem.Controllers
                 response.LastName
             });
         }
+
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] UserDTO request)
         {
@@ -117,6 +119,7 @@ namespace BloodDonationSystem.Controllers
                 Token = token
             });
         }
+
 
 
         [HttpPost("refresh-token")]

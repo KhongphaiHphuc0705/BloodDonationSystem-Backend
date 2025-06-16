@@ -77,7 +77,6 @@ namespace Application.Service.Auth
         }
 
         
-
         public TokenModel GenerateToken(User user)
         {
             var jwtTokenHandler = new JwtSecurityTokenHandler();
@@ -86,14 +85,14 @@ namespace Application.Service.Auth
             {
                 Subject = new ClaimsIdentity(new[]
                 {
-                    new Claim("UserId", user.Id.ToString()), //User ID
+                    new Claim("UserId", user.Id.ToString()),  // Thêm UserId vào trong Token
                     new Claim(ClaimTypes.Name, user.FirstName + " " + user.LastName),
                     new Claim(JwtRegisteredClaimNames.Sub, user.Phone),
                     new Claim(JwtRegisteredClaimNames.Email, user.Gmail),
                     new Claim(ClaimTypes.Role, user.Role.RoleName),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
                 }), //Config token tra ra cai gi
-                Expires = DateTime.UtcNow.AddMinutes(1), //Token expires in 1 min to test
+                Expires = DateTime.UtcNow.AddMinutes(60), //Token expires in 1 min to test
                 SigningCredentials = new SigningCredentials(
                     new SymmetricSecurityKey(secretKeyByte), //Secret key
                     SecurityAlgorithms.HmacSha256)
