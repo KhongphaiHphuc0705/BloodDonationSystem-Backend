@@ -12,7 +12,7 @@ namespace Application.Service.Users
     public class UserService(IUserRepository _userRepository,
                              IAuthRepository _authRepository,
                              IHttpContextAccessor _contextAccessor,
-                             IBloodRepository _bloodRepository) : IUserService
+                             IBloodTypeRepository _bloodRepository) : IUserService
     {
         public async Task<User> AddStaffAsync(UserDTO request)
         {

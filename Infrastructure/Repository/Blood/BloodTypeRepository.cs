@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Repository.Blood
 {
-    public class BloodRepository (BloodDonationSystemContext _context) : IBloodRepository
+    public class BloodTypeRepository (BloodDonationSystemContext _context) : IBloodTypeRepository
     {
         public async Task<BloodType?> GetBloodTypeByIdAsync(int? id)
         {

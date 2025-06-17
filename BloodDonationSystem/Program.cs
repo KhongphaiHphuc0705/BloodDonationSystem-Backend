@@ -1,7 +1,7 @@
 using Application.Service.Auth;
 using Application.Service.Events;
 using Application.Service.Users;
-using Infrastructure;
+using Infrastructure.Repository.Blood;
 using Infrastructure.Data;
 using Infrastructure.Repository.BloodRegistrationRepo;
 using Infrastructure.Repository.HealthProcedureRepo;
@@ -17,12 +17,9 @@ using System.Text;
 using Infrastructure.Repository.BloodProcedureRepo;
 using Application.Service.BloodProcedureServ;
 using Infrastructure.Repository.BloodInventoryRepo;
-using Application.Service.Auth;
-using Infrastructure.Repository.Auth;
 using Infrastructure.Repository.VolunteerRepo;
 using Application.DTO.SendEmailDTO;
 using Application.Service.EmailServ;
-using Infrastructure.Repository.Events;
 using Infrastructure.Repository.Facilities;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -47,6 +44,7 @@ builder.Services.AddScoped<IBloodProcedureService, BloodProcedureService>();
 builder.Services.AddScoped<IBloodInventoryRepository, BloodInventoryRepository>();
 builder.Services.AddScoped<IVolunteerRepository,VolunteerRepository>();
 builder.Services.AddScoped<IFacilityRepository, FacilityRepository>();
+builder.Services.AddScoped<IBloodTypeRepository, BloodTypeRepository>();
 
 // Add configuration for email service
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("Smtp"));
