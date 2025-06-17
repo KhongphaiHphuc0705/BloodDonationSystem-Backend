@@ -5,7 +5,7 @@ using Application.DTO.Token;
 using Application.DTO.UserDTO;
 using Application.Service.Auth;
 using Domain.Entities;
-using Infrastructure.Data;
+using Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -30,6 +30,7 @@ namespace BloodDonationSystem.Controllers
             {
                 return Unauthorized(response.Message);
             }
+
             return Ok(new
             {
                 response.IsSuccess,
@@ -40,6 +41,7 @@ namespace BloodDonationSystem.Controllers
                 response.LastName
             });
         }
+
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] UserDTO request)
         {
@@ -64,6 +66,20 @@ namespace BloodDonationSystem.Controllers
             var name = payload.Name;
 
             var user = await _authService.GetUserByEmailAsync(email);
+            if (user != null)
+            {
+                // User already exists, generate token
+                var token = _authService.GenerateToken(user);
+                SetRefreshTokenCookie(token.RefreshToken); // Set the refresh token in a secure cookie
+                return Ok(new
+                {
+                    Message = "Login successful",
+                    Gmail = email,
+                    Name = name,
+                    Token = token.AccessToken
+                });
+            }
+
             if (user == null)
             {
                 var nameParts = name?.Split(' ', 2);
@@ -75,7 +91,7 @@ namespace BloodDonationSystem.Controllers
                     FirstName = firstName,
                     LastName = lastName,
                     Gmail = email,
-                    IsActived = false, //Cannot use yet
+                    Status = AccountStatus.Pending, //Cannot use yet
                     RoleId = 3 // Assuming 3 is the default role ID for a user
                 };
                 await _authService.RegisterWithGoogleAsync(user);
@@ -107,7 +123,8 @@ namespace BloodDonationSystem.Controllers
         }
 
 
-        [HttpPost("renew-token")]
+
+        [HttpPost("refresh-token")]
         public async Task<IActionResult> RenewToken()
         {
             var refreshToken = _httpContextAccessor.HttpContext?.Request.Cookies["RefreshToken"];

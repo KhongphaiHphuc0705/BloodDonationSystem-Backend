@@ -14,9 +14,7 @@ namespace Application.DTO.EventsDTO
         public double EstimatedVolume { get; set; }
         public DateTime? UpdateAt { get; set; }
         public bool IsUrgent { get; set; }
-        public DateTime EventTime { get; set; }
-        public bool IsExpired { get; set; }
-
+        public DateOnly EventTime { get; set; }
         public int? BloodTypeId { get; set; }
         public BloodComponent? BloodComponent { get; set; }
     }

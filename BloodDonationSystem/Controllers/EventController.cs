@@ -13,7 +13,7 @@ namespace BloodDonationSystem.Controllers
     {
         [Authorize(Roles = "Staff")]
         [HttpPost("add-event")]
-        public async Task<IActionResult> AddEvent([FromBody] EventDTO eventRequest)
+        public async Task<IActionResult> AddEvent([FromBody] NormalEventDTO eventRequest)
         {
             if (eventRequest == null)
             {
@@ -32,7 +32,7 @@ namespace BloodDonationSystem.Controllers
 
         [Authorize(Roles = "Staff")]
         [HttpPost("add-urgent-event")]
-        public async Task<IActionResult> AddUrgentEvent([FromBody] EventDTO urgentEvent)
+        public async Task<IActionResult> AddUrgentEvent([FromBody] UrgentEventDTO urgentEvent)
         {
             if (urgentEvent == null)
             {

@@ -3,8 +3,10 @@ using Application.Service.Events;
 using Application.Service.Users;
 using Infrastructure;
 using Infrastructure.Data;
+using Infrastructure.Repository.BloodRegistrationRepo;
+using Infrastructure.Repository.HealthProcedureRepo;
+using Application.Service.HealthProcedureServ;
 using Infrastructure.Repository.Auth;
-using Infrastructure.Repository.Blood;
 using Infrastructure.Repository.Events;
 using Infrastructure.Repository.Users;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -12,12 +14,23 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using Infrastructure.Repository.BloodProcedureRepo;
+using Application.Service.BloodProcedureServ;
+using Infrastructure.Repository.BloodInventoryRepo;
+using Application.Service.Auth;
+using Infrastructure.Repository.Auth;
+using Infrastructure.Repository.VolunteerRepo;
+using Application.DTO.SendEmailDTO;
+using Application.Service.EmailServ;
+using Infrastructure.Repository.Events;
+using Infrastructure.Repository.Facilities;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddScoped<IBloodRepository, BloodRepository>();
+
+//Dependency Injection (DI) for donation
 builder.Services.AddScoped<IGoogleService, GoogleService>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -25,6 +38,19 @@ builder.Services.AddScoped<IEventRepository, EventRepository>();
 builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
+
+builder.Services.AddScoped<IBloodRegistrationRepository, BloodRegistrationRepository>();
+builder.Services.AddScoped<IHealthProcedureRepository, HealthProcedureRepository>();
+builder.Services.AddScoped<IHealthProcedureService, HealthProcedureService>();
+builder.Services.AddScoped<IBloodProcedureRepository, BloodProcedureRepository>();
+builder.Services.AddScoped<IBloodProcedureService, BloodProcedureService>();
+builder.Services.AddScoped<IBloodInventoryRepository, BloodInventoryRepository>();
+builder.Services.AddScoped<IVolunteerRepository,VolunteerRepository>();
+builder.Services.AddScoped<IFacilityRepository, FacilityRepository>();
+
+// Add configuration for email service
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("Smtp"));
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 //Add token config
 var secretKey = builder.Configuration["AppSettings:SecretKey"];
@@ -42,6 +68,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ClockSkew = TimeSpan.Zero // Disable clock skew for immediate expiration
         };
     });
+
 
 // Add services to the container.
 
@@ -79,10 +106,12 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+
 builder.Services.AddDbContext<BloodDonationSystemContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
 
 var app = builder.Build();
 

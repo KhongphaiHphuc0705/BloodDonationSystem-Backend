@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(BloodDonationSystemContext))]
-    [Migration("20250611150455_Init_2")]
-    partial class Init_2
+    [Migration("20250613155830_Init_AddNullable_BloodProcedure")]
+    partial class Init_AddNullable_BloodProcedure
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -46,7 +46,7 @@ namespace Infrastructure.Migrations
                     b.Property<bool>("IsActived")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime>("LastUpdate")
+                    b.Property<DateTime?>("LastUpdate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Title")
@@ -115,7 +115,7 @@ namespace Infrastructure.Migrations
                     b.Property<int>("RegistrationId")
                         .HasColumnType("int");
 
-                    b.Property<Guid>("RemoveBy")
+                    b.Property<Guid?>("RemoveBy")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<float>("Volume")
@@ -141,17 +141,16 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("BloodComponent")
+                    b.Property<int?>("BloodComponent")
                         .HasColumnType("int");
 
-                    b.Property<int>("BloodTypeId")
+                    b.Property<int?>("BloodTypeId")
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsQualified")
+                    b.Property<bool?>("IsQualified")
                         .HasColumnType("bit");
 
                     b.Property<DateTime>("PerformedAt")
@@ -180,7 +179,7 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("BloodProcedureId")
+                    b.Property<int?>("BloodProcedureId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreateAt")
@@ -189,40 +188,43 @@ namespace Infrastructure.Migrations
                     b.Property<int>("EventId")
                         .HasColumnType("int");
 
-                    b.Property<int>("HealthId")
+                    b.Property<int?>("HealthId")
                         .HasColumnType("int");
 
                     b.Property<Guid>("MemberId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("StaffId")
+                    b.Property<Guid?>("StaffId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("Status")
+                    b.Property<int?>("Status")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("UpdateAt")
+                    b.Property<DateTime?>("UpdateAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("VolunteerId")
+                    b.Property<int?>("VolunteerId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("BloodProcedureId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[BloodProcedureId] IS NOT NULL");
 
                     b.HasIndex("EventId");
 
                     b.HasIndex("HealthId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[HealthId] IS NOT NULL");
 
                     b.HasIndex("MemberId");
 
                     b.HasIndex("StaffId");
 
                     b.HasIndex("VolunteerId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[VolunteerId] IS NOT NULL");
 
                     b.ToTable("BloodRegistrations");
                 });
@@ -259,20 +261,20 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("CreateAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("IsLegit")
+                    b.Property<bool?>("IsLegit")
                         .HasColumnType("bit");
 
                     b.Property<Guid>("MemberId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("StaffId")
+                    b.Property<Guid?>("StaffId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Text")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("UpdateAt")
+                    b.Property<DateTime?>("UpdateAt")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
@@ -312,13 +314,13 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("EventTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("EventType")
-                        .HasColumnType("bit");
-
                     b.Property<int>("FacilityId")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsExpired")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsUrgent")
                         .HasColumnType("bit");
 
                     b.Property<int>("MaxOfDonor")
@@ -408,7 +410,6 @@ namespace Infrastructure.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("HBV")
@@ -592,7 +593,7 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("StartVolunteerDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("UpdateAt")
+                    b.Property<DateTime?>("UpdateAt")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
@@ -657,8 +658,7 @@ namespace Infrastructure.Migrations
                     b.HasOne("Domain.Entities.User", "RemovedByUser")
                         .WithMany("BloodInventories")
                         .HasForeignKey("RemoveBy")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("BloodRegistration");
 
@@ -672,8 +672,7 @@ namespace Infrastructure.Migrations
                     b.HasOne("Domain.Entities.BloodType", "BloodType")
                         .WithMany("BloodProcedures")
                         .HasForeignKey("BloodTypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Domain.Entities.User", "PerformedByUser")
                         .WithMany("BloodProcedures")
@@ -691,8 +690,7 @@ namespace Infrastructure.Migrations
                     b.HasOne("Domain.Entities.BloodProcedure", "BloodProcedure")
                         .WithOne("BloodRegistration")
                         .HasForeignKey("Domain.Entities.BloodRegistration", "BloodProcedureId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Domain.Entities.Event", "Event")
                         .WithMany("BloodRegistrations")
@@ -703,8 +701,7 @@ namespace Infrastructure.Migrations
                     b.HasOne("Domain.Entities.HealthProcedure", "HealthProcedure")
                         .WithOne("BloodRegistration")
                         .HasForeignKey("Domain.Entities.BloodRegistration", "HealthId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Domain.Entities.User", "Member")
                         .WithMany("MemberRegistrations")
@@ -715,14 +712,12 @@ namespace Infrastructure.Migrations
                     b.HasOne("Domain.Entities.User", "Staff")
                         .WithMany("StaffRegistrations")
                         .HasForeignKey("StaffId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("Domain.Entities.Volunteer", "Volunteer")
                         .WithOne("BloodRegistration")
                         .HasForeignKey("Domain.Entities.BloodRegistration", "VolunteerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("BloodProcedure");
 
@@ -754,8 +749,7 @@ namespace Infrastructure.Migrations
                     b.HasOne("Domain.Entities.User", "Staff")
                         .WithMany("StaffComments")
                         .HasForeignKey("StaffId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("Blog");
 

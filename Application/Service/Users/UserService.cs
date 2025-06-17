@@ -1,5 +1,6 @@
 ﻿using Application.DTO.UserDTO;
 using Domain.Entities;
+using Domain.Enums;
 using Infrastructure.Helper;
 using Infrastructure.Repository.Auth;
 using Infrastructure.Repository.Blood;
@@ -31,7 +32,7 @@ namespace Application.Service.Users
                 Gmail = request.Gmail,
                 BloodTypeId = request.BloodTypeId,
                 CreateAt = DateTime.UtcNow,
-                IsActived = true,
+                Status = AccountStatus.Active,
                 RoleId = 2
             };
             await _authRepository.RegisterAsync(user);
