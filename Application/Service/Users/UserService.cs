@@ -60,7 +60,7 @@ namespace Application.Service.Users
             {
                 Name = $"{u.LastName} {u.FirstName}",
                 Email = u.Gmail,
-                Status = u.IsActived,
+                Status = u.Status,
                 Dob = u.Dob,
 
             }).ToList();
