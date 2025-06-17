@@ -14,8 +14,9 @@ namespace Application.Service.Users
         Task<ProfileDTO?> GetUserByIdAsync(Guid userId);
         Task<PaginatedResult<ListUserDTO>> GetAllUserAsync(int pageNumber, int pageSize);
 
+        Task<User> AssignUserRole(Guid userId, int roleId);
         Task<ProfileDTO> UpdateUserProfileAsync(Guid userId, UserDTO updateUser);
         Task<bool> DeactiveUserAsync(Guid userId);
-        Task<User> AddStaffAsync (UserDTO request);
+        //Task<User> AddStaffAsync (UserDTO request);
     }
 }
