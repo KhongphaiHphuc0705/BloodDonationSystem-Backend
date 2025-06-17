@@ -1,4 +1,4 @@
-﻿using Application.DTO;
+﻿using Application.DTO.UserDTO;
 using Domain.Entities;
 using Infrastructure.Helper;
 using System;
@@ -11,9 +11,10 @@ namespace Application.Service.Users
 {
     public interface IUserService
     {
-    
-        Task<PaginatedResult<User>> GetAllUserAsync(int pageNumber, int pageSize);
+        Task<ProfileDTO?> GetUserByIdAsync(Guid userId);
+        Task<PaginatedResult<ListUserDTO>> GetAllUserAsync(int pageNumber, int pageSize);
 
+        Task<ProfileDTO> UpdateUserProfileAsync(Guid userId, UserDTO updateUser);
         Task<bool> DeactiveUserAsync(Guid userId);
         Task<User> AddStaffAsync (UserDTO request);
     }
