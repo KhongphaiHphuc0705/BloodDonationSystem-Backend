@@ -1,4 +1,4 @@
-﻿using Application.DTO;
+﻿using Application.DTO.UserDTO;
 using Application.Service.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -8,7 +8,7 @@ namespace BloodDonationSystem.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UserController (IUserService _userService) : ControllerBase
+    public class UserController(IUserService _userService) : ControllerBase
     {
         [HttpPut("deactive/{userId}")]
         public async Task<IActionResult> DeactiveUser(Guid userId)
@@ -34,16 +34,16 @@ namespace BloodDonationSystem.Controllers
             {
                 return BadRequest("User already exists with the provided phone number.");
             }
-            return Ok(new 
-            { 
-                Message = "Staff added successfully.", 
-                User = user 
+            return Ok(new
+            {
+                Message = "Staff added successfully.",
+                User = user
             });
         }
 
         [Authorize(Roles = "Admin")]
         [HttpGet("all-users")]
-        public async Task<IActionResult> GetAllUsers([FromQuery]int pageNumber = 1,[FromQuery] int pageSize = 10)
+        public async Task<IActionResult> GetAllUsers([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
             var users = await _userService.GetAllUserAsync(pageNumber, pageSize);
             if (users == null || !users.Items.Any())
@@ -51,6 +51,44 @@ namespace BloodDonationSystem.Controllers
                 return NotFound("No users found.");
             }
             return Ok(users);
+        }
+
+        [Authorize]
+        [HttpGet("profile")]
+        public async Task<IActionResult> GetUserProfile()
+        {
+            var userId = User.FindFirst("UserId")?.Value;
+            if (userId == null)
+            {
+                return Unauthorized("User not authenticated.");
+            }
+            var profile = await _userService.GetUserByIdAsync(Guid.Parse(userId));
+            if (profile == null)
+            {
+                return NotFound("User profile not found.");
+            }
+            return Ok(profile);
+        }
+
+        [Authorize]
+        [HttpPut("update-profile")]
+        public async Task<IActionResult> UpdateUserProfile([FromBody] UserDTO profileDto)
+        {
+            if (profileDto == null)
+            {
+                return BadRequest("Invalid profile data.");
+            }
+            var userId = User.FindFirst("UserId")?.Value;
+            if (userId == null)
+            {
+                return Unauthorized("User not authenticated.");
+            }
+            var updatedProfile = await _userService.UpdateUserProfileAsync(Guid.Parse(userId), profileDto);
+            if (updatedProfile == null)
+            {
+                return NotFound("User profile not found or update failed.");
+            }
+            return Ok(updatedProfile);
         }
     }
 }

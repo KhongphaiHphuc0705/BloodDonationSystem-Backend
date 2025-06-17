@@ -1,7 +1,7 @@
-﻿using Application.DTO;
-using Application.DTO.GoogleDTO;
+﻿using Application.DTO.GoogleDTO;
 using Application.DTO.LoginDTO;
 using Application.DTO.Token;
+using Application.DTO.UserDTO;
 using Domain.Entities;
 using Domain.Enums;
 using Infrastructure.Repository.Auth;
