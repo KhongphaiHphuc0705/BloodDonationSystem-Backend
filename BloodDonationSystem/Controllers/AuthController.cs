@@ -66,19 +66,6 @@ namespace BloodDonationSystem.Controllers
             var name = payload.Name;
 
             var user = await _authService.GetUserByEmailAsync(email);
-            if (user != null)
-            {
-                // User already exists, generate token
-                var token = _authService.GenerateToken(user);
-                SetRefreshTokenCookie(token.RefreshToken); // Set the refresh token in a secure cookie
-                return Ok(new
-                {
-                    Message = "Login successful",
-                    Gmail = email,
-                    Name = name,
-                    Token = token.AccessToken
-                });
-            }
 
             if (user == null)
             {
@@ -95,6 +82,20 @@ namespace BloodDonationSystem.Controllers
                     RoleId = 3 // Assuming 3 is the default role ID for a user
                 };
                 await _authService.RegisterWithGoogleAsync(user);
+            }
+
+            if (user != null)
+            {
+                // User already exists, generate token
+                var token = _authService.GenerateToken(user);
+                SetRefreshTokenCookie(token.RefreshToken); // Set the refresh token in a secure cookie
+                return Ok(new
+                {
+                    Message = "Login successful",
+                    Gmail = email,
+                    Name = name,
+                    Token = token.AccessToken
+                });
             }
 
             return Ok(new

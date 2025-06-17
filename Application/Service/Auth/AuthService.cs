@@ -80,17 +80,27 @@ namespace Application.Service.Auth
         {
             var jwtTokenHandler = new JwtSecurityTokenHandler();
             var secretKeyByte = Encoding.UTF8.GetBytes(_configuration["AppSettings:SecretKey"]); //Lay secret key
-            var tokenDescription = new SecurityTokenDescriptor
+            var claims = new List<Claim>
             {
-                Subject = new ClaimsIdentity(new[]
-                {
-                    new Claim("UserId", user.Id.ToString()),  // Thêm UserId vào trong Token
+                new Claim("UserId", user.Id.ToString()),  // Thêm UserId vào trong Token
                     new Claim(ClaimTypes.Name, user.FirstName + " " + user.LastName),
-                    new Claim(JwtRegisteredClaimNames.Sub, user.Phone),
-                    new Claim(JwtRegisteredClaimNames.Email, user.Gmail),
                     new Claim(ClaimTypes.Role, user.Role.RoleName),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-                }), //Config token tra ra cai gi
+            };
+            // Only add phone claim if available
+            if (!string.IsNullOrEmpty(user.Phone))
+            {
+                claims.Add(new Claim(JwtRegisteredClaimNames.Sub, user.Phone));
+            }
+            // Only add phone claim if available
+            if (!string.IsNullOrEmpty(user.Gmail))
+            {
+                claims.Add(new Claim(JwtRegisteredClaimNames.Email, user.Gmail));
+            }
+
+            var tokenDescription = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims), //Config token tra ra cai gi
                 Expires = DateTime.UtcNow.AddMinutes(60), //Token expires in 1 min to test
                 SigningCredentials = new SigningCredentials(
                     new SymmetricSecurityKey(secretKeyByte), //Secret key
