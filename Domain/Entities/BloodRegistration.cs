@@ -11,7 +11,7 @@ public class BloodRegistration
     [Key]
     public int Id { get; set; }
 
-    public RegistrationStatus? Status { get; set; }
+    public bool? IsApproved { get; set; }
 
     public DateTime CreateAt { get; set; }
     public DateTime? UpdateAt { get; set; }

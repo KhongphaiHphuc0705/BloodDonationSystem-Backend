@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace Application.DTO.BloodRegistrationDTO
 {
-    public class EvaluateBloodRegistration
+    public class RejectBloodRegistration
     {
-        public RegistrationStatus Status { get; set; }
+        public bool IsApproved { get; set; }
     }
 }

@@ -8,6 +8,8 @@ namespace Application.DTO.HealthProcedureDTO
 {
     public class HealthProcedureRequest
     {
+        public string? FullName { get; set; }
+        public DateTime? dob { get; set; }
         public int Pressure { get; set; }
         public float Temperature { get; set; }
         public float Hb { get; set; }
@@ -17,5 +19,6 @@ namespace Application.DTO.HealthProcedureDTO
         public bool IsHealth { get; set; }
         public string? Description { get; set; }
         public int BloodRegistrationId { get; set; } // Lấy từ Frontend
+        public string? StaffName { get; set; }
     }
 }

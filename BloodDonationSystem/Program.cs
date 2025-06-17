@@ -1,7 +1,6 @@
 using Application.Service.Auth;
 using Application.Service.Events;
 using Application.Service.Users;
-using Infrastructure;
 using Infrastructure.Data;
 using Infrastructure.Repository.BloodRegistrationRepo;
 using Infrastructure.Repository.HealthProcedureRepo;
@@ -17,13 +16,11 @@ using System.Text;
 using Infrastructure.Repository.BloodProcedureRepo;
 using Application.Service.BloodProcedureServ;
 using Infrastructure.Repository.BloodInventoryRepo;
-using Application.Service.Auth;
-using Infrastructure.Repository.Auth;
 using Infrastructure.Repository.VolunteerRepo;
 using Application.DTO.SendEmailDTO;
 using Application.Service.EmailServ;
-using Infrastructure.Repository.Events;
 using Infrastructure.Repository.Facilities;
+using Application.Service.BloodRegistrationServ;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,6 +37,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddScoped<IBloodRegistrationRepository, BloodRegistrationRepository>();
+builder.Services.AddScoped<IBloodRegistrationService, BloodRegistrationService>();
 builder.Services.AddScoped<IHealthProcedureRepository, HealthProcedureRepository>();
 builder.Services.AddScoped<IHealthProcedureService, HealthProcedureService>();
 builder.Services.AddScoped<IBloodProcedureRepository, BloodProcedureRepository>();

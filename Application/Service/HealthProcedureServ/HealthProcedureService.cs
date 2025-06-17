@@ -1,14 +1,8 @@
 ﻿using Application.DTO.HealthProcedureDTO;
 using Domain.Entities;
-using Domain.Enums;
 using Infrastructure.Repository.BloodRegistrationRepo;
 using Infrastructure.Repository.HealthProcedureRepo;
 using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application.Service.HealthProcedureServ
 {
@@ -30,7 +24,7 @@ namespace Application.Service.HealthProcedureServ
         {
             var bloodRegistration = await _repoRegis.GetByIdAsync(request.BloodRegistrationId);
 
-            if (bloodRegistration == null || bloodRegistration.Status != RegistrationStatus.Approved)
+            if (bloodRegistration == null || bloodRegistration.IsApproved == false)
                 return null;
 
             var userId = _contextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
@@ -54,7 +48,8 @@ namespace Application.Service.HealthProcedureServ
             };
 
             var healthProcedureAdded = await _repo.AddAsync(healthProcedure);
-            bloodRegistration.HealthProcedure = healthProcedureAdded;
+
+            bloodRegistration.HealthId = healthProcedureAdded.Id;
             await _repoRegis.UpdateAsync(bloodRegistration);
 
             return healthProcedureAdded;

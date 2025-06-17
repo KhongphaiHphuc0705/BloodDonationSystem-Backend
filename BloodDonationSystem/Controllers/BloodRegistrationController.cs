@@ -1,9 +1,7 @@
 ﻿using Application.DTO.BloodRegistration;
 using Application.DTO.BloodRegistrationDTO;
 using Application.Service.BloodRegistrationServ;
-using Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BloodDonationSystem.Controllers
@@ -24,6 +22,12 @@ namespace BloodDonationSystem.Controllers
         public async Task<IActionResult> RegisterDonation([FromBody] BloodRegistrationRequest request)
         {
             var bloodRegistration = await _service.RegisterDonation(request);
+            if (bloodRegistration == null)
+                return BadRequest(new
+                {
+                    Message = "Event not found or registration unsuccessfully"
+                });
+
             return Ok(new
             {
                 Message = "Register donation successfully"
@@ -31,24 +35,24 @@ namespace BloodDonationSystem.Controllers
         }
 
         [Authorize(Roles = "Staff")]
-        [HttpPatch("evaluate/{id}")]
-        public async Task<IActionResult> EvaluateRegistration(int id, [FromBody] EvaluateBloodRegistration evaluation)
+        [HttpPut("reject/{id}")]
+        public async Task<IActionResult> RejectRegistration(int id)
         {
-            var bloodRegistration = await _service.EvaluateRegistration(id, evaluation);
+            var bloodRegistration = await _service.RejectRegistration(id);
             if (bloodRegistration == null)
                 return NotFound(new
                 {
-                    Message = "Blood registration not found"
+                    Message = "Blood registration not found or reject unsuccessfully"
                 });
 
             return Ok(new
             {
-                Message = "Evaluate registration successfully",
+                Message = "Reject blood registration successfully",
             });
         }
 
         [Authorize(Roles = "Member")]
-        [HttpPatch("cancel/{id}")]
+        [HttpPut("cancel/{id}")]
         public async Task<IActionResult> CancelOwnRegistration(int id)
         {
             var bloodRegistration = await _service.CancelOwnRegistration(id);

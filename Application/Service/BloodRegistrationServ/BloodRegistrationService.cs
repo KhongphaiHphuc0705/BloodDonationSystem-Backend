@@ -1,15 +1,11 @@
 ﻿using Application.DTO.BloodRegistration;
 using Application.DTO.BloodRegistrationDTO;
 using Domain.Entities;
-using Domain.Enums;
 using Infrastructure.Repository.BloodRegistrationRepo;
+using Infrastructure.Repository.Events;
 using Infrastructure.Repository.VolunteerRepo;
 using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace Application.Service.BloodRegistrationServ
 {
@@ -18,13 +14,15 @@ namespace Application.Service.BloodRegistrationServ
         private readonly IBloodRegistrationRepository _repository;
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly IVolunteerRepository _repoVolun;
+        private readonly IEventRepository _repoEvent;
 
         public BloodRegistrationService(IBloodRegistrationRepository repository, IHttpContextAccessor contextAccessor, 
-            IVolunteerRepository repoVolun)
+            IVolunteerRepository repoVolun, IEventRepository repoEvent)
         {
             _repository = repository;
             _contextAccessor = contextAccessor;
             _repoVolun = repoVolun;
+            _repoEvent = repoEvent;
         }
 
         public async Task<BloodRegistration?> RegisterDonation(BloodRegistrationRequest request)
@@ -34,6 +32,10 @@ namespace Application.Service.BloodRegistrationServ
             {
                 throw new UnauthorizedAccessException("User not found or invalid");
             }
+
+            var eventDetails = await _repoEvent.GetEventByIdAsync(request.EventId);
+            if (eventDetails == null)
+                return null;
 
             var registration = new BloodRegistration
             {
@@ -46,10 +48,10 @@ namespace Application.Service.BloodRegistrationServ
             return registration;
         }
 
-        public async Task<BloodRegistration?> EvaluateRegistration(int bloodRegisId, EvaluateBloodRegistration evaluation)
+        public async Task<BloodRegistration?> RejectRegistration(int bloodRegisId)
         {
             var bloodRegistration = await _repository.GetByIdAsync(bloodRegisId);
-            if (bloodRegistration == null)
+            if (bloodRegistration == null || bloodRegistration.IsApproved == false)
                 return null;
 
             var userId = _contextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
@@ -58,7 +60,7 @@ namespace Application.Service.BloodRegistrationServ
                 throw new UnauthorizedAccessException("User not found or invalid");
             }
 
-            bloodRegistration.Status = evaluation.Status;
+            bloodRegistration.IsApproved = false;
             bloodRegistration.UpdateAt = DateTime.Now;
             bloodRegistration.StaffId = creatorId;
 
@@ -71,7 +73,7 @@ namespace Application.Service.BloodRegistrationServ
             var bloodRegistration = await _repository.GetByIdAsync(bloodRegisId);
             // Check đơn có tồn tại, bị hủy, hay bị từ chối, hoặc đã khám hay chưa
             if (bloodRegistration == null || 
-                bloodRegistration.Status == RegistrationStatus.Rejected ||
+                bloodRegistration.IsApproved == false ||
                 bloodRegistration.HealthId != null)
                 return null;
 
@@ -85,7 +87,7 @@ namespace Application.Service.BloodRegistrationServ
             if (bloodRegistration.MemberId != creatorId)
                 return null;
 
-            bloodRegistration.Status = RegistrationStatus.Rejected;
+            bloodRegistration.IsApproved = false;
             bloodRegistration.UpdateAt = DateTime.Now;
 
             await _repository.UpdateAsync(bloodRegistration);

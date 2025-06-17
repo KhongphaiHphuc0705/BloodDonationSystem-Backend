@@ -1,7 +1,6 @@
 ﻿using Application.DTO;
 using Application.Service.Users;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BloodDonationSystem.Controllers
