@@ -14,6 +14,7 @@ namespace Infrastructure.Repository.Users
         Task<List<User>> GetAllUserAsync(int pageNumber, int pageSize);
         Task<User?> GetUserByIdAsync(Guid id);
 
+        Task<User> AssignUserRole(User user);
         Task<User> UpdateUserProfileAsync(User updateUser);
 
         Task<int> DeactiveUserAsync(Guid id);

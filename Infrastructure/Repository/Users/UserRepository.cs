@@ -46,5 +46,12 @@ namespace Infrastructure.Repository.Users
             await _context.SaveChangesAsync();
             return updateUser;
         }
+
+        public async Task<User> AssignUserRole(User user)
+        {
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+            return user;
+        }
     }
 }

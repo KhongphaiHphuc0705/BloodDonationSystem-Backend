@@ -14,29 +14,18 @@ namespace Application.Service.Users
                              IHttpContextAccessor _contextAccessor,
                              IBloodTypeRepository _bloodRepository) : IUserService
     {
-        public async Task<User> AddStaffAsync(UserDTO request)
+        public async Task<User> AssignUserRole(Guid userId, int roleId)
         {
-            if (await _authRepository.UserExistsByPhoneAsync(request.Phone))
+            var user = await _userRepository.GetUserByIdAsync(userId);
+            if (user == null)
             {
-                // Log or handle the case where the user already exists
-                return null; // User already exists
+                return null;
             }
 
-            var user = new User
-            {
-                FirstName = request.FirstName,
-                LastName = request.LastName,
-                Gender = request.Gender,
-                Dob = request.Dob,
-                Phone = request.Phone,
-                Gmail = request.Gmail,
-                BloodTypeId = request.BloodTypeId,
-                CreateAt = DateTime.UtcNow,
-                Status = AccountStatus.Active,
-                RoleId = 2
-            };
-            await _authRepository.RegisterAsync(user);
-            return user; // Return the added staff user
+            user.RoleId = roleId;
+
+            var assignedRole = await _userRepository.AssignUserRole(user);
+            return assignedRole;
         }
 
         public async Task<bool> DeactiveUserAsync(Guid userId)
