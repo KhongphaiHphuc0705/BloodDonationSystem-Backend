@@ -12,7 +12,7 @@ namespace Application.DTO.EventsDTO
         public string Title { get; set; }
         public int MaxOfDonor { get; set; }
         public double EstimatedVolume { get; set; }
-        public DateTime? UpdateAt { get; set; }
+        //public DateTime? UpdateAt { get; set; }
         public bool IsUrgent { get; set; }
         public DateOnly EventTime { get; set; }
         public int? BloodTypeId { get; set; }

@@ -138,6 +138,7 @@ namespace Application.Service.Events
             existEvent.UpdateAt = DateTime.UtcNow;
             existEvent.IsExpired = existEvent.IsExpired; // Keep original expired status
             existEvent.BloodTypeId = updateEvent.BloodTypeId; // Update blood type if provided
+            existEvent.BloodComponent = updateEvent.BloodComponent; // Update blood component if provided
             existEvent.UpdateBy = updaterId; // Set the updater ID
 
             await _eventRepository.UpdateEventAsync(existEvent);
