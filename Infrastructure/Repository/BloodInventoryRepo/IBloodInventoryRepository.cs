@@ -10,5 +10,6 @@ namespace Infrastructure.Repository.BloodInventoryRepo
 {
     public interface IBloodInventoryRepository : IGenericRepository<BloodInventory>
     {
+        Task<BloodInventory?> GetByBloodRegisId(int regisId);
     }
 }

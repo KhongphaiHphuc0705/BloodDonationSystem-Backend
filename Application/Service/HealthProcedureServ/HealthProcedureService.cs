@@ -6,24 +6,12 @@ using Microsoft.AspNetCore.Http;
 
 namespace Application.Service.HealthProcedureServ
 {
-    public class HealthProcedureService : IHealthProcedureService
+    public class HealthProcedureService(IHealthProcedureRepository _repo, IBloodRegistrationRepository _repoRegis,
+        IHttpContextAccessor _contextAccessor) : IHealthProcedureService
     {
-        private readonly IHealthProcedureRepository _repo;
-        private readonly IBloodRegistrationRepository _repoRegis;
-        private readonly IHttpContextAccessor _contextAccessor;
-
-        public HealthProcedureService(IHealthProcedureRepository repo, IBloodRegistrationRepository repoRegis,
-            IHttpContextAccessor contextAccessor)
+        public async Task<HealthProcedure?> RecordHealthProcedureAsync(int id, HealthProcedureRequest request)
         {
-            _repo = repo;
-            _repoRegis = repoRegis; 
-            _contextAccessor = contextAccessor;
-        }
-
-        public async Task<HealthProcedure?> RecordHealthProcedureAsync(HealthProcedureRequest request)
-        {
-            var bloodRegistration = await _repoRegis.GetByIdAsync(request.BloodRegistrationId);
-
+            var bloodRegistration = await _repoRegis.GetByIdAsync(id);
             if (bloodRegistration == null || bloodRegistration.IsApproved == false)
                 return null;
 
@@ -49,7 +37,13 @@ namespace Application.Service.HealthProcedureServ
 
             var healthProcedureAdded = await _repo.AddAsync(healthProcedure);
 
+            if (healthProcedureAdded.IsHealth == true)
+                bloodRegistration.IsApproved = true;
+            else
+                bloodRegistration.IsApproved = false;
             bloodRegistration.HealthId = healthProcedureAdded.Id;
+            bloodRegistration.UpdateAt = DateTime.Now;
+            bloodRegistration.StaffId = creatorId;
             await _repoRegis.UpdateAsync(bloodRegistration);
 
             return healthProcedureAdded;

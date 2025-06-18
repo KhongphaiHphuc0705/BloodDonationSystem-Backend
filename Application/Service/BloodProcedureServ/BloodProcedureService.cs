@@ -5,44 +5,20 @@ using Domain.Enums;
 using Infrastructure.Repository.BloodInventoryRepo;
 using Infrastructure.Repository.BloodProcedureRepo;
 using Infrastructure.Repository.BloodRegistrationRepo;
-using Infrastructure.Repository.Events;
-using Infrastructure.Repository.Facilities;
 using Infrastructure.Repository.HealthProcedureRepo;
 using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.WebSockets;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace Application.Service.BloodProcedureServ
 {
-    public class BloodProcedureService : IBloodProcedureService
+    public class BloodProcedureService(IBloodProcedureRepository _repo, IBloodRegistrationRepository _repoRegis,
+        IHealthProcedureRepository _repoHealth, IBloodInventoryRepository _repoInven,
+        IHttpContextAccessor _contextAccessor, IEmailService _servEmail) : IBloodProcedureService
     {
-        private readonly IBloodProcedureRepository _repo;
-        private readonly IBloodRegistrationRepository _repoRegis;
-        private readonly IHealthProcedureRepository _repoHealth;
-        private readonly IBloodInventoryRepository _repoInven;
-        private readonly IHttpContextAccessor _contextAccessor;
-        private readonly IEmailService _servEmail;
-
-        public BloodProcedureService(IBloodProcedureRepository repo, IBloodRegistrationRepository repoRegis, 
-            IHealthProcedureRepository repoHealth, IBloodInventoryRepository repoInven, 
-            IHttpContextAccessor contextAccessor, IEmailService servEmail)
+        public async Task<BloodProcedure?> RecordBloodCollectionAsync(int id, BloodCollectionRequest request)
         {
-            _repo = repo;
-            _repoRegis = repoRegis;
-            _repoHealth = repoHealth;
-            _repoInven = repoInven;
-            _contextAccessor = contextAccessor;
-            _servEmail = servEmail;
-        }
-
-        public async Task<BloodProcedure?> RecordBloodCollectionAsync(BloodCollectionRequest request)
-        {
-            var bloodRegistration = await _repoRegis.GetByIdAsync(request.BloodRegistrationId);
-            if (bloodRegistration == null)
+            var bloodRegistration = await _repoRegis.GetByIdAsync(id);
+            if (bloodRegistration == null || bloodRegistration.IsApproved == false)
                 return null;
 
             var healthProcedure = await _repoHealth.GetByIdAsync(bloodRegistration.HealthId);
@@ -65,6 +41,8 @@ namespace Application.Service.BloodProcedureServ
 
             var bloodCollectionAdded = await _repo.AddAsync(bloodCollection);
             bloodRegistration.BloodProcedureId = bloodCollectionAdded.Id;
+            bloodRegistration.UpdateAt = DateTime.Now;
+            bloodRegistration.StaffId = creatorId;
             await _repoRegis.UpdateAsync(bloodRegistration);
 
             // Gửi mail thông báo cho người hiến máu
@@ -83,6 +61,10 @@ namespace Application.Service.BloodProcedureServ
             if (bloodProcedure == null)
                 return null;
 
+            var existingInventory = await _repoInven.GetByBloodRegisId(bloodRegistration.Id);
+            if (existingInventory != null && !existingInventory.IsAvailable)  // Máu đã !IsAvailable thì không thể cập nhật
+                return null;
+
             var userId = _contextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
             if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out Guid creatorId))
             {
@@ -96,9 +78,29 @@ namespace Application.Service.BloodProcedureServ
             bloodProcedure.PerformedBy = creatorId;
             await _repo.UpdateAsync(bloodProcedure);  // Update thêm thông tin cho BloodProcedure
 
-            if (bloodProcedure.IsQualified == false)
+            bloodRegistration.UpdateAt = DateTime.Now;
+            bloodRegistration.StaffId = creatorId;
+            if (request.IsQualified)
+                bloodRegistration.IsApproved = true;
+            else 
+                bloodRegistration.IsApproved = false;
+            await _repoRegis.UpdateAsync(bloodRegistration);  // Cập nhật thông tin đơn đăng ký hiến máu
+
+            // Kiểm tra kho máu để update cho trường hợp đánh lộn
+            if (existingInventory == null) {
+                if (request.IsQualified)
+                    await AddNewBloodUnit(bloodRegistration);  // Thêm đơn vị máu mới vào kho nếu đủ điều kiện
                 return bloodProcedure;
-            await AddNewBloodUnit(bloodRegistration);  // Thêm đơn vị máu mới vào kho nếu đủ điều kiện
+            }
+            if (request.IsQualified == false)
+            {
+                existingInventory.IsAvailable = false;
+                existingInventory.RemoveBy = creatorId;
+                existingInventory.UpdateAt = DateTime.Now;
+            }
+            existingInventory.BloodTypeId = request.BloodTypeId;
+            existingInventory.BloodComponent = request.BloodComponent;
+            await _repoInven.UpdateAsync(existingInventory);
 
             return bloodProcedure;
         }

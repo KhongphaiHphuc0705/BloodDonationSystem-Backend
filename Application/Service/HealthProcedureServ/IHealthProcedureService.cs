@@ -10,6 +10,6 @@ namespace Application.Service.HealthProcedureServ
 {
     public interface IHealthProcedureService
     {
-        Task<HealthProcedure?> RecordHealthProcedureAsync(HealthProcedureRequest request);
+        Task<HealthProcedure?> RecordHealthProcedureAsync(int id, HealthProcedureRequest request);
     }
 }

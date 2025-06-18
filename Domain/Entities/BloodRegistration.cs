@@ -10,11 +10,10 @@ public class BloodRegistration
 {
     [Key]
     public int Id { get; set; }
-
     public bool? IsApproved { get; set; }
-
     public DateTime CreateAt { get; set; }
     public DateTime? UpdateAt { get; set; }
+    public string? Description { get; set; }
 
     public int? VolunteerId { get; set; }
     public int? HealthId { get; set; }

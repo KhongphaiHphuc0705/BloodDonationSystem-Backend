@@ -3,29 +3,17 @@ using Application.DTO.BloodRegistrationDTO;
 using Domain.Entities;
 using Infrastructure.Repository.BloodRegistrationRepo;
 using Infrastructure.Repository.Events;
+using Infrastructure.Repository.Users;
 using Infrastructure.Repository.VolunteerRepo;
 using Microsoft.AspNetCore.Http;
 
 
 namespace Application.Service.BloodRegistrationServ
 {
-    public class BloodRegistrationService : IBloodRegistrationService
+    public class BloodRegistrationService(IBloodRegistrationRepository _repository, IHttpContextAccessor _contextAccessor,
+        IEventRepository _repoEvent, IUserRepository _repoUser) : IBloodRegistrationService
     {
-        private readonly IBloodRegistrationRepository _repository;
-        private readonly IHttpContextAccessor _contextAccessor;
-        private readonly IVolunteerRepository _repoVolun;
-        private readonly IEventRepository _repoEvent;
-
-        public BloodRegistrationService(IBloodRegistrationRepository repository, IHttpContextAccessor contextAccessor, 
-            IVolunteerRepository repoVolun, IEventRepository repoEvent)
-        {
-            _repository = repository;
-            _contextAccessor = contextAccessor;
-            _repoVolun = repoVolun;
-            _repoEvent = repoEvent;
-        }
-
-        public async Task<BloodRegistration?> RegisterDonation(BloodRegistrationRequest request)
+        public async Task<BloodRegistration?> RegisterDonation(int id, BloodRegistrationRequest request)
         {
             var userId = _contextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
             if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out Guid creatorId))
@@ -33,18 +21,22 @@ namespace Application.Service.BloodRegistrationServ
                 throw new UnauthorizedAccessException("User not found or invalid");
             }
 
-            var eventDetails = await _repoEvent.GetEventByIdAsync(request.EventId);
-            if (eventDetails == null)
+            var existingEvent = await _repoEvent.GetEventByIdAsync(id);
+            if (existingEvent == null)
                 return null;
+
+            var user = await _repoUser.GetUserByIdAsync(creatorId);
+            if (user != null && user.LastDonation == null)
+                user.LastDonation = request.LastDonation;
 
             var registration = new BloodRegistration
             {
                 CreateAt = DateTime.Now,
                 MemberId = creatorId,
-                EventId = request.EventId
+                EventId = id
             };
-
             await _repository.AddAsync(registration);
+            
             return registration;
         }
 
@@ -92,24 +84,6 @@ namespace Application.Service.BloodRegistrationServ
 
             await _repository.UpdateAsync(bloodRegistration);
             return bloodRegistration;
-        }
-
-        public async Task<Volunteer?> RegisterVolunteerDonation(RegisterVolunteerDonation request)
-        {
-            var userId = _contextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
-            if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out Guid creatorId))
-                throw new UnauthorizedAccessException("User not found or invalid");
-
-            var volunteer = new Volunteer
-            {
-                CreateAt = DateTime.Now,
-                StartVolunteerDate = request.StartVolunteerDate,
-                EndVolunteerDate = request.EndVolunteerDate, 
-                IsExpired = false,
-                MemberId = creatorId
-            };
-
-            return await _repoVolun.AddAsync(volunteer);
         }
     }
 }
