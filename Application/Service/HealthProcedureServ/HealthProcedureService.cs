@@ -36,6 +36,7 @@ namespace Application.Service.HealthProcedureServ
             };
             var healthProcedureAdded = await _repo.AddAsync(healthProcedure);
 
+<<<<<<< HEAD
             if (request.IsHealth == true)
                 bloodRegistration.IsApproved = true;
             else
@@ -43,6 +44,15 @@ namespace Application.Service.HealthProcedureServ
             bloodRegistration.UpdateAt = DateTime.Now;
             bloodRegistration.StaffId = creatorId;
             bloodRegistration.HealthId = healthProcedureAdded.Id;
+=======
+            if (healthProcedureAdded.IsHealth == true)
+                bloodRegistration.IsApproved = true;
+            else
+                bloodRegistration.IsApproved = false;
+            bloodRegistration.HealthId = healthProcedureAdded.Id;
+            bloodRegistration.UpdateAt = DateTime.Now;
+            bloodRegistration.StaffId = creatorId;
+>>>>>>> 7813e3d6e8429ba0d2072fc7e67b73930be3fabd
             await _repoRegis.UpdateAsync(bloodRegistration);
 
             return healthProcedureAdded;

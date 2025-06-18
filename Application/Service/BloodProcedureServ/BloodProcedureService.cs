@@ -8,6 +8,7 @@ using Infrastructure.Repository.BloodRegistrationRepo;
 using Infrastructure.Repository.HealthProcedureRepo;
 using Microsoft.AspNetCore.Http;
 
+
 namespace Application.Service.BloodProcedureServ
 {
     public class BloodProcedureService(IBloodProcedureRepository _repo, IBloodRegistrationRepository _repoRegis,
@@ -40,6 +41,8 @@ namespace Application.Service.BloodProcedureServ
             var bloodCollectionAdded = await _repo.AddAsync(bloodCollection);
 
             bloodRegistration.BloodProcedureId = bloodCollectionAdded.Id;
+            bloodRegistration.UpdateAt = DateTime.Now;
+            bloodRegistration.StaffId = creatorId;
             await _repoRegis.UpdateAsync(bloodRegistration);
 
             // Gửi mail thông báo cho người hiến máu

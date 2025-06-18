@@ -3,6 +3,7 @@ using Application.Service.BloodRegistrationServ;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Application.DTO;
+using Application.DTO.BloodRegistrationDTO;
 
 namespace BloodDonationSystem.Controllers
 {
@@ -21,6 +22,7 @@ namespace BloodDonationSystem.Controllers
                     IsSuccess = true,
                     Message = "Register donation unsuccessfully"
                 });
+
             return Ok(new ApiResponse<BloodRegistrationRequest>()
             {
                 IsSuccess = true,
