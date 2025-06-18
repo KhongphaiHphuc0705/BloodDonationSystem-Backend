@@ -10,7 +10,7 @@ namespace BloodDonationSystem.Controllers
     [ApiController]
     public class UserController(IUserService _userService) : ControllerBase
     {
-        [HttpPut("deactive/{userId}")]
+        [HttpPut("{userId}/deactive")]
         public async Task<IActionResult> DeactiveUser(Guid userId)
         {
             var result = await _userService.DeactiveUserAsync(userId);
@@ -22,7 +22,7 @@ namespace BloodDonationSystem.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpPut("assign-role/{userId}")]
+        [HttpPut("{userId}/assign-role")]
         public async Task<IActionResult> AssignUserRole(Guid userId, int roleId)
         {
             var user = await _userService.AssignUserRole(userId, roleId);
@@ -40,7 +40,7 @@ namespace BloodDonationSystem.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpGet("all-users")]
+        [HttpGet]
         public async Task<IActionResult> GetAllUsers([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
             var users = await _userService.GetAllUserAsync(pageNumber, pageSize);

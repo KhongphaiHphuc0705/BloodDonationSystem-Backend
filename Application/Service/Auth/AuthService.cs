@@ -32,6 +32,21 @@ namespace Application.Service.Auth
                     Message = "Invalid phone or password."
                 };
             }
+            if (user.Status == AccountStatus.Inactive)
+            {
+                return new LoginResponse // Invalid login response
+                {
+                    IsSuccess = false,
+                    Message = "This account not available"
+                };
+            } else if (user.Status == AccountStatus.Banned)
+            {
+                return new LoginResponse // Invalid login response
+                {
+                    IsSuccess = false,
+                    Message = "This account is banned"
+                };
+            }
             var token = GenerateToken(user);
             SetRefreshTokenCookie(token.RefreshToken); // Set the refresh token in a secure cookie
 
