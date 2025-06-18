@@ -12,9 +12,8 @@ namespace Application.Service.BloodRegistrationServ
 {
     public interface IBloodRegistrationService
     {
-        Task<BloodRegistration?> RegisterDonation(BloodRegistrationRequest request);
-        Task<BloodRegistration?> EvaluateRegistration(int bloodRegisId, EvaluateBloodRegistration evaluation);
-        Task<BloodRegistration?> CancelOwnRegistration(int bloodRegisId);
-        Task<Volunteer?> RegisterVolunteerDonation(RegisterVolunteerDonation request);
+        Task<BloodRegistration?> RegisterDonation(int id, BloodRegistrationRequest request);
+        Task<BloodRegistration?> RejectBloodRegistration(int bloodRegisId);
+        Task<BloodRegistration?> CancelOwnRegistration(int id);
     }
 }

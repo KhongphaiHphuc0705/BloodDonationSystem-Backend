@@ -21,6 +21,7 @@ using Infrastructure.Repository.VolunteerRepo;
 using Application.DTO.SendEmailDTO;
 using Application.Service.EmailServ;
 using Infrastructure.Repository.Facilities;
+using Application.Service.VolunteerServ;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,8 +44,10 @@ builder.Services.AddScoped<IBloodProcedureRepository, BloodProcedureRepository>(
 builder.Services.AddScoped<IBloodProcedureService, BloodProcedureService>();
 builder.Services.AddScoped<IBloodInventoryRepository, BloodInventoryRepository>();
 builder.Services.AddScoped<IVolunteerRepository,VolunteerRepository>();
+builder.Services.AddScoped<IVolunteerService, VolunteerService>();
 builder.Services.AddScoped<IFacilityRepository, FacilityRepository>();
 builder.Services.AddScoped<IBloodTypeRepository, BloodTypeRepository>();
+
 
 // Add configuration for email service
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("Smtp"));
