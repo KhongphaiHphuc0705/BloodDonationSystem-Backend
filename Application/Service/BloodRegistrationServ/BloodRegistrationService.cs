@@ -82,5 +82,6 @@ namespace Application.Service.BloodRegistrationServ
             await _repository.UpdateAsync(bloodRegistration);
             return bloodRegistration;
         }
+
     }
 }
