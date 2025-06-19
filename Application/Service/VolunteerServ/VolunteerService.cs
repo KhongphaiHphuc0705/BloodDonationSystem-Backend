@@ -3,14 +3,6 @@ using Domain.Entities;
 using Infrastructure.Repository.Users;
 using Infrastructure.Repository.VolunteerRepo;
 using Microsoft.AspNetCore.Http;
-<<<<<<< HEAD
-=======
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
->>>>>>> 7813e3d6e8429ba0d2072fc7e67b73930be3fabd
 
 namespace Application.Service.VolunteerServ
 {
@@ -25,14 +17,10 @@ namespace Application.Service.VolunteerServ
 
             var user = await _repoUser.GetUserByIdAsync(creatorId);
             if (user != null && user.LastDonation == null)
-<<<<<<< HEAD
             {
                 user.LastDonation = request.LastDonation;
                 await _repoUser.UpdateUserProfileAsync(user);
             }
-=======
-                user.LastDonation = request.LastDonation;
->>>>>>> 7813e3d6e8429ba0d2072fc7e67b73930be3fabd
 
             var volunteer = new Volunteer
             {
@@ -42,10 +30,6 @@ namespace Application.Service.VolunteerServ
                 IsExpired = false,
                 MemberId = creatorId
             };
-<<<<<<< HEAD
-
-=======
->>>>>>> 7813e3d6e8429ba0d2072fc7e67b73930be3fabd
             return await _repoVolun.AddAsync(volunteer);
         }
     }
