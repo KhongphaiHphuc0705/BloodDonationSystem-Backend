@@ -3,11 +3,13 @@ using Application.DTO.EventsDTO;
 using Application.Service.Events;
 using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BloodDonationSystem.Controllers
 {
+    [EnableCors("LocalPolicy")]
     [Route("api/[controller]")]
     [ApiController]
     public class EventController(IEventService _eventService) : ControllerBase

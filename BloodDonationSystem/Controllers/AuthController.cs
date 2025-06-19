@@ -7,6 +7,7 @@ using Application.Service.Auth;
 using Domain.Entities;
 using Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -17,6 +18,7 @@ using System.Text;
 
 namespace BloodDonationSystem.Controllers
 {
+    [EnableCors("LocalPolicy")]
     [Route("api/[controller]")]
     [ApiController]
     public class AuthController(IAuthService _authService, IConfiguration _configuration,
