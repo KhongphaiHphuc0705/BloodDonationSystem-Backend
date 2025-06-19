@@ -21,10 +21,7 @@ using Infrastructure.Repository.VolunteerRepo;
 using Application.DTO.SendEmailDTO;
 using Application.Service.EmailServ;
 using Infrastructure.Repository.Facilities;
-<<<<<<< HEAD
-=======
 using Application.Service.BloodRegistrationServ;
->>>>>>> 7813e3d6e8429ba0d2072fc7e67b73930be3fabd
 using Application.Service.VolunteerServ;
 
 var builder = WebApplication.CreateBuilder(args);

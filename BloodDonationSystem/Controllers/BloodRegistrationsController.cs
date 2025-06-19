@@ -3,7 +3,6 @@ using Application.Service.BloodRegistrationServ;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Application.DTO;
-using Application.DTO.BloodRegistrationDTO;
 
 namespace BloodDonationSystem.Controllers
 {
