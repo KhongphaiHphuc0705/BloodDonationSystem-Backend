@@ -28,6 +28,18 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddHttpContextAccessor();
 
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy("LocalPolicy", policy =>
+//    {
+//        policy
+//            .WithOrigins("http://localhost:5173")    // your React app
+//            .AllowAnyHeader()
+//            .AllowAnyMethod()
+//            .AllowCredentials();                      // if you send cookies/auth
+//    });
+//});
+
 
 //Dependency Injection (DI) for donation
 builder.Services.AddScoped<IGoogleService, GoogleService>();
@@ -121,7 +133,7 @@ builder.Services.AddDbContext<BloodDonationSystemContext>(options =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-
+app.UseCors("LocalPolicy");
 app.UseHttpsRedirection();
 app.UseAuthentication();              // Bật middleware xác thực
 app.UseAuthorization();

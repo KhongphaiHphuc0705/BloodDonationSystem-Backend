@@ -7,6 +7,7 @@ using Application.Service.Auth;
 using Domain.Entities;
 using Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -17,12 +18,12 @@ using System.Text;
 
 namespace BloodDonationSystem.Controllers
 {
-    [Route("api/[controller]")]
+    [EnableCors("LocalPolicy")]
     [ApiController]
     public class AuthController(IAuthService _authService, IConfiguration _configuration,
                                 IGoogleService _googleService, IHttpContextAccessor _httpContextAccessor) : ControllerBase
     {
-        [HttpPost("login")]
+        [HttpPost("api/login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
             var response = await _authService.LoginAsync(request.Phone, request.Password);
@@ -42,7 +43,7 @@ namespace BloodDonationSystem.Controllers
             });
         }
 
-        [HttpPost("register")]
+        [HttpPost("api/register")]
         public async Task<IActionResult> Register([FromBody] UserDTO request)
         {
             var user = await _authService.RegisterAsync(request);
@@ -53,7 +54,7 @@ namespace BloodDonationSystem.Controllers
             return Ok("Register sucessfully");
         }
 
-        [HttpPost("google")]
+        [HttpPost("api/google")]
         public async Task<IActionResult> GoogleLogin([FromBody] GoogleAuthRequest request)
         {
             var payload = await _googleService.ValidateGoogleTokenAsync(request.Credential);
@@ -105,7 +106,7 @@ namespace BloodDonationSystem.Controllers
             });
         }
 
-        [HttpPut("google-update-Login")]
+        [HttpPut("api/google-update-Login")]
         public async Task<IActionResult> UpdateGoogleLogin([FromBody] UpdateGoogleLogin request)
         {
             var user = await _authService.UpdateGoogleLoginAsync(request);
@@ -125,13 +126,13 @@ namespace BloodDonationSystem.Controllers
 
 
 
-        [HttpPost("refresh-token")]
+        [HttpPost("api/refresh-token")]
         public async Task<IActionResult> RenewToken()
         {
             var refreshToken = _httpContextAccessor.HttpContext?.Request.Cookies["RefreshToken"];
             if (string.IsNullOrEmpty(refreshToken))
             {
-                return BadRequest(new ApiResponse
+                return BadRequest(new
                 {
                     Success = false,
                     Message = "Refresh token not found"
@@ -167,7 +168,7 @@ namespace BloodDonationSystem.Controllers
                         StringComparison.InvariantCultureIgnoreCase);
                     if(!alg)
                     {
-                        return Ok(new ApiResponse
+                        return Ok(new
                         {
                             Success = false,
                             Message = "Invalid token"
@@ -182,7 +183,7 @@ namespace BloodDonationSystem.Controllers
                 var expireDate = ConvertUnixToDateTime(utcExpireDate);
                 if (expireDate > DateTime.UtcNow)
                 {
-                    return Ok(new ApiResponse
+                    return Ok(new
                     {
                         Success = false,
                         Message = "Token is not expired yet"
@@ -193,7 +194,7 @@ namespace BloodDonationSystem.Controllers
                 var storageToken = await _authService.GetRefreshTokenAsync(refreshToken);
                 if (storageToken is null)
                 {
-                    return Ok(new ApiResponse
+                    return Ok(new
                     {
                         Success = false,
                         Message = "Refresh token not found"
@@ -203,7 +204,7 @@ namespace BloodDonationSystem.Controllers
                 //Check5: Check if refresh token is used/revoked?
                 if(storageToken.IsUsed)
                 {
-                    return Ok(new ApiResponse
+                    return Ok(new
                     {
                         Success = false,
                         Message = "Refresh token is used"
@@ -212,7 +213,7 @@ namespace BloodDonationSystem.Controllers
 
                 if(storageToken.IsRevoked)
                 {
-                    return Ok(new ApiResponse
+                    return Ok(new
                     {
                         Success = false,
                         Message = "Refresh token is revoked"
@@ -223,7 +224,7 @@ namespace BloodDonationSystem.Controllers
                 var jti = tokenInvalidate.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Jti).Value;
                 if (storageToken.JwtId != jti)
                 {
-                    return Ok(new ApiResponse
+                    return Ok(new
                     {
                         Success = false,
                         Message = "Token is not match"
@@ -242,7 +243,7 @@ namespace BloodDonationSystem.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new ApiResponse
+                return BadRequest(new
                 {
                     Success = false,
                     Message = "Something went wrong"
