@@ -18,25 +18,26 @@ namespace BloodDonationSystem.Controllers
         {
             if (eventRequest == null)
             {
-                return BadRequest(new ApiResponse
+                return BadRequest(new ApiResponse<NormalEventDTO>
                 {
-                    Success = false,
+                    IsSuccess = false,
                     Message = "Event request cannot be null"
                 });
             }
             var createdEvent = await _eventService.AddEventAsync(eventRequest);
             if (createdEvent == null)
             {
-                return BadRequest(new ApiResponse
+                return BadRequest(new ApiResponse<NormalEventDTO>
                 {
-                    Success = false,
+                    IsSuccess = false,
                     Message = "Failed to create event."
                 });
             }
-            return Ok(new ApiResponse
+            return Ok(new ApiResponse<NormalEventDTO>
             {
-                Success = true,
-                Message = "Event created successfully"
+                IsSuccess = true,
+                Message = "Event created successfully",
+                Data = eventRequest
             });
         }
 
@@ -46,9 +47,9 @@ namespace BloodDonationSystem.Controllers
         {
             if (urgentEvent == null)
             {
-                return BadRequest(new ApiResponse
+                return BadRequest(new ApiResponse<UrgentEventDTO>
                 {
-                    Success = false,
+                    IsSuccess = false,
                     Message = "Urgent request cannot be null"
                 });
             }
@@ -56,15 +57,15 @@ namespace BloodDonationSystem.Controllers
             var createdEvent = await _eventService.AddUrgentEventAsync(urgentEvent);
             if (createdEvent == null)
             {
-                return BadRequest(new ApiResponse
+                return BadRequest(new ApiResponse<UrgentEventDTO>
                 {
-                    Success = false,
+                    IsSuccess = false,
                     Message = "Failed to create urgent event."
                 });
             }
-            return Ok(new ApiResponse
+            return Ok(new ApiResponse<UrgentEventDTO>
             {
-                Success = true,
+                IsSuccess = true,
                 Message = "Urgent event created successfully"
             });
         }
@@ -105,7 +106,7 @@ namespace BloodDonationSystem.Controllers
                 return BadRequest("Invalid event ID.");
             }
             await _eventService.DeleteEventAsync(eventId);
-            return Ok(new ApiResponse
+            return Ok(new
             {
                 Success = true,
                 Message = "Event deleted successfully"

@@ -131,7 +131,7 @@ namespace BloodDonationSystem.Controllers
             var refreshToken = _httpContextAccessor.HttpContext?.Request.Cookies["RefreshToken"];
             if (string.IsNullOrEmpty(refreshToken))
             {
-                return BadRequest(new ApiResponse
+                return BadRequest(new
                 {
                     Success = false,
                     Message = "Refresh token not found"
@@ -167,7 +167,7 @@ namespace BloodDonationSystem.Controllers
                         StringComparison.InvariantCultureIgnoreCase);
                     if(!alg)
                     {
-                        return Ok(new ApiResponse
+                        return Ok(new
                         {
                             Success = false,
                             Message = "Invalid token"
@@ -182,7 +182,7 @@ namespace BloodDonationSystem.Controllers
                 var expireDate = ConvertUnixToDateTime(utcExpireDate);
                 if (expireDate > DateTime.UtcNow)
                 {
-                    return Ok(new ApiResponse
+                    return Ok(new
                     {
                         Success = false,
                         Message = "Token is not expired yet"
@@ -193,7 +193,7 @@ namespace BloodDonationSystem.Controllers
                 var storageToken = await _authService.GetRefreshTokenAsync(refreshToken);
                 if (storageToken is null)
                 {
-                    return Ok(new ApiResponse
+                    return Ok(new
                     {
                         Success = false,
                         Message = "Refresh token not found"
@@ -203,7 +203,7 @@ namespace BloodDonationSystem.Controllers
                 //Check5: Check if refresh token is used/revoked?
                 if(storageToken.IsUsed)
                 {
-                    return Ok(new ApiResponse
+                    return Ok(new
                     {
                         Success = false,
                         Message = "Refresh token is used"
@@ -212,7 +212,7 @@ namespace BloodDonationSystem.Controllers
 
                 if(storageToken.IsRevoked)
                 {
-                    return Ok(new ApiResponse
+                    return Ok(new
                     {
                         Success = false,
                         Message = "Refresh token is revoked"
@@ -223,7 +223,7 @@ namespace BloodDonationSystem.Controllers
                 var jti = tokenInvalidate.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Jti).Value;
                 if (storageToken.JwtId != jti)
                 {
-                    return Ok(new ApiResponse
+                    return Ok(new
                     {
                         Success = false,
                         Message = "Token is not match"
@@ -242,7 +242,7 @@ namespace BloodDonationSystem.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new ApiResponse
+                return BadRequest(new
                 {
                     Success = false,
                     Message = "Something went wrong"
