@@ -10,13 +10,7 @@ public class BloodRegistration
 {
     [Key]
     public int Id { get; set; }
-<<<<<<< HEAD
-
     public bool? IsApproved { get; set; }
-
-=======
-    public bool? IsApproved { get; set; }
->>>>>>> 7813e3d6e8429ba0d2072fc7e67b73930be3fabd
     public DateTime CreateAt { get; set; }
     public DateTime? UpdateAt { get; set; }
     public string? Description { get; set; }
