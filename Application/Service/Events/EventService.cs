@@ -22,7 +22,7 @@ namespace Application.Service.Events
                 Title = eventRequest.Title,
                 MaxOfDonor = eventRequest.MaxOfDonor,
                 EstimatedVolume = eventRequest.EstimatedVolume,
-                CreateAt = DateTime.UtcNow,
+                CreateAt = DateTime.Now,
                 EventTime = eventRequest.EventTime,
                 IsUrgent = false,
                 IsExpired = false,
@@ -135,7 +135,7 @@ namespace Application.Service.Events
             existEvent.EstimatedVolume = updateEvent.EstimatedVolume;
             existEvent.EventTime = updateEvent.EventTime;
             existEvent.IsUrgent = updateEvent.IsUrgent;
-            existEvent.UpdateAt = DateTime.UtcNow;
+            existEvent.UpdateAt = DateTime.Now;
             existEvent.IsExpired = existEvent.IsExpired; // Keep original expired status
             existEvent.BloodTypeId = updateEvent.BloodTypeId; // Update blood type if provided
             existEvent.UpdateBy = updaterId; // Set the updater ID

@@ -15,6 +15,7 @@ namespace Domain.Entities
         public int Id { get; set; }
         public float Volume { get; set; }
         public DateTime CreateAt { get; set; }
+        public DateTime? UpdateAt { get; set; }
         public DateTime ExpiredDate { get; set; }
         public bool IsAvailable { get; set; }
 

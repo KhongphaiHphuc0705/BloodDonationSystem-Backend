@@ -9,6 +9,6 @@ namespace Application.DTO.BloodRegistrationDTO
 {
     public class CancelOwnRegistration
     {
-        public RegistrationStatus Status { get; set; }
+        public bool IsApproved { get; set; }
     }
 }
