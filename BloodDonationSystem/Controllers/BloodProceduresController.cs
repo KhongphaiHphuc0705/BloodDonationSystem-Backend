@@ -1,11 +1,13 @@
-﻿using Application.DTO.BloodProcedureDTO;
+﻿using Application.DTO;
+using Application.DTO.BloodProcedureDTO;
 using Application.Service.BloodProcedureServ;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Application.DTO;
 
 namespace BloodDonationSystem.Controllers
 {
+    [EnableCors("LocalPolicy")]
     [ApiController]
     public class BloodProceduresController(IBloodProcedureService _service) : ControllerBase
     {

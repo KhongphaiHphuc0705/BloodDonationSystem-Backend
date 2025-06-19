@@ -1,10 +1,12 @@
 ﻿using Application.DTO.UserDTO;
 using Application.Service.Users;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BloodDonationSystem.Controllers
 {
+    [EnableCors("LocalPolicy")]
     [Route("api/[controller]")]
     [ApiController]
     public class UserController(IUserService _userService) : ControllerBase
