@@ -8,6 +8,6 @@ namespace Infrastructure.Repository.BloodCompatibility
 {
     public interface IBloodCompatibility
     {
-
+        
     }
 }

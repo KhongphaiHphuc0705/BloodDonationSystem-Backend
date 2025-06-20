@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(BloodDonationSystemContext))]
-    [Migration("20250612000438_Init_AddNullable")]
-    partial class Init_AddNullable
+    [Migration("20250620070354_Init_RemoveBloodTypeIdInCompability")]
+    partial class Init_RemoveBloodTypeIdInCompability
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -66,9 +66,6 @@ namespace Infrastructure.Migrations
                     b.Property<int>("Id")
                         .HasColumnType("int");
 
-                    b.Property<int>("BloodTypeId")
-                        .HasColumnType("int");
-
                     b.Property<int>("DonorTypeId")
                         .HasColumnType("int");
 
@@ -78,7 +75,10 @@ namespace Infrastructure.Migrations
                     b.Property<int>("BloodComponent")
                         .HasColumnType("int");
 
-                    b.HasKey("Id", "BloodTypeId", "DonorTypeId", "RecipientTypeId");
+                    b.Property<int>("BloodTypeId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id", "DonorTypeId", "RecipientTypeId");
 
                     b.HasIndex("BloodTypeId");
 
@@ -118,6 +118,9 @@ namespace Infrastructure.Migrations
                     b.Property<Guid?>("RemoveBy")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTime?>("UpdateAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<float>("Volume")
                         .HasColumnType("real");
 
@@ -141,16 +144,16 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("BloodComponent")
+                    b.Property<int?>("BloodComponent")
                         .HasColumnType("int");
 
-                    b.Property<int>("BloodTypeId")
+                    b.Property<int?>("BloodTypeId")
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsQualified")
+                    b.Property<bool?>("IsQualified")
                         .HasColumnType("bit");
 
                     b.Property<DateTime>("PerformedAt")
@@ -185,20 +188,23 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("CreateAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("EventId")
                         .HasColumnType("int");
 
                     b.Property<int?>("HealthId")
                         .HasColumnType("int");
 
+                    b.Property<bool?>("IsApproved")
+                        .HasColumnType("bit");
+
                     b.Property<Guid>("MemberId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("StaffId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdateAt")
                         .HasColumnType("datetime2");
@@ -299,7 +305,7 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("BloodComponent")
                         .HasColumnType("int");
 
-                    b.Property<int>("BloodTypeId")
+                    b.Property<int?>("BloodTypeId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreateAt")
@@ -311,8 +317,8 @@ namespace Infrastructure.Migrations
                     b.Property<double>("EstimatedVolume")
                         .HasColumnType("float");
 
-                    b.Property<DateTime>("EventTime")
-                        .HasColumnType("datetime2");
+                    b.Property<DateOnly>("EventTime")
+                        .HasColumnType("date");
 
                     b.Property<int>("FacilityId")
                         .HasColumnType("int");
@@ -529,9 +535,6 @@ namespace Infrastructure.Migrations
                     b.Property<string>("HashPass")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsActived")
-                        .HasColumnType("bit");
-
                     b.Property<DateTime?>("LastDonation")
                         .HasColumnType("datetime2");
 
@@ -551,6 +554,9 @@ namespace Infrastructure.Migrations
                         .HasColumnType("nvarchar(10)");
 
                     b.Property<int>("RoleId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdateAt")
@@ -672,8 +678,7 @@ namespace Infrastructure.Migrations
                     b.HasOne("Domain.Entities.BloodType", "BloodType")
                         .WithMany("BloodProcedures")
                         .HasForeignKey("BloodTypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Domain.Entities.User", "PerformedByUser")
                         .WithMany("BloodProcedures")
@@ -764,8 +769,7 @@ namespace Infrastructure.Migrations
                     b.HasOne("Domain.Entities.BloodType", "BloodType")
                         .WithMany("Events")
                         .HasForeignKey("BloodTypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Domain.Entities.User", "Creator")
                         .WithMany("CreatedEvents")

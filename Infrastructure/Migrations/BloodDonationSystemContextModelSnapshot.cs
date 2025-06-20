@@ -63,9 +63,6 @@ namespace Infrastructure.Migrations
                     b.Property<int>("Id")
                         .HasColumnType("int");
 
-                    b.Property<int>("BloodTypeId")
-                        .HasColumnType("int");
-
                     b.Property<int>("DonorTypeId")
                         .HasColumnType("int");
 
@@ -75,7 +72,10 @@ namespace Infrastructure.Migrations
                     b.Property<int>("BloodComponent")
                         .HasColumnType("int");
 
-                    b.HasKey("Id", "BloodTypeId", "DonorTypeId", "RecipientTypeId");
+                    b.Property<int>("BloodTypeId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id", "DonorTypeId", "RecipientTypeId");
 
                     b.HasIndex("BloodTypeId");
 
