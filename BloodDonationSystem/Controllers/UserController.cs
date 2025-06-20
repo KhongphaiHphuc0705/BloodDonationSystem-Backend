@@ -10,6 +10,18 @@ namespace BloodDonationSystem.Controllers
     [ApiController]
     public class UserController(IUserService _userService) : ControllerBase
     {
+        [Authorize(Roles = "Admin")]
+        [HttpPost("api/users/{userId}/ban")]
+        public async Task<IActionResult> BanUser(Guid userId)
+        {
+            var result = await _userService.BanUserAsync(userId);
+            if (!result)
+            {
+                return BadRequest("User may not exist or is already banned.");
+            }
+            return Ok("Ban successfully");
+        }
+
         [Authorize]
         [HttpPut("api/users/deactive")]
         public async Task<IActionResult> DeactiveUser(Guid userId)

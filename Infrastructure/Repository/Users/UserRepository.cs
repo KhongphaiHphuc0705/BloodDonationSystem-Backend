@@ -14,6 +14,8 @@ namespace Infrastructure.Repository.Users
                 .ExecuteUpdateAsync(u => u.SetProperty(x => x.Status, AccountStatus.Inactive));
         }
 
+
+
         public async Task<int> CountAllAsync()
         {
             return await _context.Users.CountAsync();
@@ -46,6 +48,13 @@ namespace Infrastructure.Repository.Users
             _context.Users.Update(user);
             await _context.SaveChangesAsync();
             return user;
+        }
+
+        public async Task<int> BanUserAsync(Guid id)
+        {
+            return await _context.Users
+                .Where(u => u.Id == id && u.Status == AccountStatus.Active)
+                .ExecuteUpdateAsync(u => u.SetProperty(x => x.Status, AccountStatus.Banned));
         }
     }
 }
