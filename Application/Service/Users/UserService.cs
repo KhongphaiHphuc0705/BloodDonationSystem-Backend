@@ -71,9 +71,9 @@ namespace Application.Service.Users
             {
                 Name = $"{u.LastName} {u.FirstName}",
                 Email = u.Gmail,
-                Status = u.Status,
+                Status = u.Status.ToString(),
                 Dob = u.Dob,
-
+                Role = u.Role.RoleName
             }).ToList();
 
             return new PaginatedResult<ListUserDTO>

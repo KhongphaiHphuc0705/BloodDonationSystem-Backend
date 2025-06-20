@@ -24,6 +24,7 @@ namespace Infrastructure.Repository.Users
         public async Task<List<User>> GetAllUserAsync(int pageNumber, int pageSize)
         {
             return await _context.Users
+                .Include(u => u.Role)
                 .OrderByDescending(u => u.CreateAt)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
