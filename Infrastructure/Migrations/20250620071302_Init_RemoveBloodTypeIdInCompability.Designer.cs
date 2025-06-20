@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(BloodDonationSystemContext))]
-    [Migration("20250620070354_Init_RemoveBloodTypeIdInCompability")]
+    [Migration("20250620071302_Init_RemoveBloodTypeIdInCompability")]
     partial class Init_RemoveBloodTypeIdInCompability
     {
         /// <inheritdoc />
@@ -75,12 +75,7 @@ namespace Infrastructure.Migrations
                     b.Property<int>("BloodComponent")
                         .HasColumnType("int");
 
-                    b.Property<int>("BloodTypeId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id", "DonorTypeId", "RecipientTypeId");
-
-                    b.HasIndex("BloodTypeId");
 
                     b.HasIndex("DonorTypeId");
 
@@ -622,12 +617,6 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.BloodCompatibility", b =>
                 {
-                    b.HasOne("Domain.Entities.BloodType", "BloodType")
-                        .WithMany()
-                        .HasForeignKey("BloodTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Domain.Entities.BloodType", "DonorType")
                         .WithMany("Donors")
                         .HasForeignKey("DonorTypeId")
@@ -639,8 +628,6 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("RecipientTypeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("BloodType");
 
                     b.Navigation("DonorType");
 
