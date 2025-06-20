@@ -12,7 +12,6 @@ namespace Domain.Entities
     {
         public int Id { get; set; }
         public BloodComponent BloodComponent { get; set; }
-        public int BloodTypeId { get; set; }
         public int DonorTypeId { get; set; }
         public int RecipientTypeId { get; set; }
         [ForeignKey("BloodTypeId")]

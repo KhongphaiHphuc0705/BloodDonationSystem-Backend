@@ -7,10 +7,10 @@ namespace Infrastructure.Data
 {
     public class BloodDonationSystemContext : DbContext
     {
-        public BloodDonationSystemContext(DbContextOptions<BloodDonationSystemContext> options)
-            : base(options)
-        {
-        }
+        //public BloodDonationSystemContext(DbContextOptions<BloodDonationSystemContext> options)
+        //    : base(options)
+        //{
+        //}
 
         public DbSet<BloodType> BloodTypes { get; set; }
         public DbSet<BloodCompatibility> BloodCompatibilities { get; set; }
@@ -46,7 +46,7 @@ namespace Infrastructure.Data
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<BloodCompatibility>()
-                .HasKey(bc => new { bc.Id, bc.BloodTypeId, bc.DonorTypeId, bc.RecipientTypeId });
+                .HasKey(bc => new { bc.Id, bc.DonorTypeId, bc.RecipientTypeId });
 
             modelBuilder.Entity<User>()
                 .Property(u => u.Latitude)
