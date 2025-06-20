@@ -10,7 +10,8 @@ namespace BloodDonationSystem.Controllers
     [ApiController]
     public class UserController(IUserService _userService) : ControllerBase
     {
-        [HttpPut("api/users/{userId}/deactive")]
+        [Authorize]
+        [HttpPut("api/users/deactive")]
         public async Task<IActionResult> DeactiveUser(Guid userId)
         {
             var result = await _userService.DeactiveUserAsync(userId);
