@@ -36,6 +36,7 @@ namespace Infrastructure.Repository.BlogRepo
         public async Task<List<Blog>> GetAllBlogAsync(int pageNumber, int pageSize)
         {
             return await _context.Blogs
+                .Where(b => b.IsActived == true)
                 .Include(b => b.Author)
                 .OrderByDescending(blog => blog.CreateAt)
                 .Skip((pageNumber-1)*pageSize)
@@ -46,6 +47,7 @@ namespace Infrastructure.Repository.BlogRepo
         public async Task<Blog> GetBlogByIdAsync(int id)
         {
             var blog = await _context.Blogs
+                .Where(b => b.IsActived == true)
                 .Include(b => b.Author)
                 .FirstOrDefaultAsync(b => b.Id == id);
             return blog;
