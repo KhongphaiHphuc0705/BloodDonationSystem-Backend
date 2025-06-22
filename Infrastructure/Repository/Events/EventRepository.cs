@@ -15,7 +15,7 @@ namespace Infrastructure.Repository.Events
 
         public async Task<int> CountAllAsync()
         {
-            var count = await _context.Events.CountAsync();
+            var count = await _context.Events.Where(e => e.IsExpired == false).CountAsync();
             return count; // Return the total count of events
         }
 

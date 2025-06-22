@@ -1,5 +1,6 @@
 using Application.DTO.SendEmailDTO;
 using Application.Service.Auth;
+using Application.Service.BlogSer;
 using Application.Service.BloodCompatibilitySer;
 using Application.Service.BloodProcedureServ;
 using Application.Service.BloodRegistrationServ;
@@ -10,6 +11,7 @@ using Application.Service.Users;
 using Application.Service.VolunteerServ;
 using Infrastructure.Data;
 using Infrastructure.Repository.Auth;
+using Infrastructure.Repository.BlogRepo;
 using Infrastructure.Repository.Blood;
 using Infrastructure.Repository.BloodCompatibilityRepo;
 using Infrastructure.Repository.BloodInventoryRepo;
@@ -53,6 +55,10 @@ builder.Services.AddScoped<IFacilityRepository, FacilityRepository>();
 builder.Services.AddScoped<IBloodTypeRepository, BloodTypeRepository>();
 builder.Services.AddScoped<IVolunteerRepository, VolunteerRepository>();
 builder.Services.AddScoped<IVolunteerService, VolunteerService>();
+
+builder.Services.AddScoped<IBlogRepository, BlogRepository>();
+builder.Services.AddScoped<IBlogService, BlogService>();
+
 builder.Services.AddScoped<IBloodCompatibilityRepository, BloodCompatibilityRepository>();
 builder.Services.AddScoped<IBloodCompatibilityService, BloodCompatibilityService>();
 
