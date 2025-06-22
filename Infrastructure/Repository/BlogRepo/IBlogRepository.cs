@@ -10,7 +10,7 @@ namespace Infrastructure.Repository.BlogRepo
         Task<Blog> GetBlogByIdAsync(int id);
 
         Task<int> CountAllAsync();
-        Task<List<Blog>> GetAllBlogAsync(int pageNumber, int pageSize);
+        Task<List<Blog>> GetAllActiveBlogAsync(int pageNumber, int pageSize);
 
         Task<Blog> UpdateBlogAsync(Blog blog);
 
