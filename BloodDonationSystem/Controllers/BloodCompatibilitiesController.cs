@@ -1,10 +1,12 @@
 ﻿using Application.Service.BloodCompatibilitySer;
 using Domain.Enums;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BloodDonationSystem.Controllers
 {
+    [EnableCors("LocalPolicy")]
     [ApiController]
     public class BloodCompatibilitiesController(IBloodCompatibilityService _bloodCompatibilityService) : ControllerBase
     {
