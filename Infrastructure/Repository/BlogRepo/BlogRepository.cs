@@ -33,7 +33,7 @@ namespace Infrastructure.Repository.BlogRepo
             return true; // Blog successfully deleted
         }
 
-        public async Task<List<Blog>> GetAllBlogAsync(int pageNumber, int pageSize)
+        public async Task<List<Blog>> GetAllActiveBlogAsync(int pageNumber, int pageSize)
         {
             return await _context.Blogs
                 .Where(b => b.IsActived == true)

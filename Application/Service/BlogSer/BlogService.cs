@@ -51,7 +51,7 @@ namespace Application.Service.BlogSer
         public async Task<PaginatedResult<BlogResponseDTO>> GetAllBlogAsync(int pageNumber, int pageSize)
         {
             var totalItems = await _blogRepository.CountAllAsync();
-            var blogs = await _blogRepository.GetAllBlogAsync(pageNumber, pageSize);
+            var blogs = await _blogRepository.GetAllActiveBlogAsync(pageNumber, pageSize);
 
             var items = blogs.Select(b => new BlogResponseDTO
             {
