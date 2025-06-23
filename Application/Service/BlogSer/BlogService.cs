@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -50,7 +51,7 @@ namespace Application.Service.BlogSer
 
         public async Task<PaginatedResult<BlogResponseDTO>> GetAllBlogAsync(int pageNumber, int pageSize)
         {
-            var userRole = _contextAccessor.HttpContext?.User.FindFirst("Role")?.Value;
+            var userRole = _contextAccessor.HttpContext?.User.FindFirst(ClaimTypes.Role)?.Value;
 
             int totalItems;
             IEnumerable<Blog> blogs;
