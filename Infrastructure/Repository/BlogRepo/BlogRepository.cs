@@ -7,7 +7,7 @@ namespace Infrastructure.Repository.BlogRepo
 {
     public class BlogRepository(BloodDonationSystemContext _context) : IBlogRepository
     {
-        public async Task<int> CountAllAsync()
+        public async Task<int> CountAllActiveBlogAsync()
         {
             var count = await _context.Blogs.Where(b => b.IsActived == true).CountAsync();
             return count;
@@ -44,7 +44,17 @@ namespace Infrastructure.Repository.BlogRepo
                 .ToListAsync();
         }
 
-        public async Task<Blog> GetBlogByIdAsync(int id)
+        public async Task<List<Blog>> GetAllBlogAsync(int pageNumber, int pageSize)
+        {
+            return await _context.Blogs
+                .Include(b => b.Author)
+                .OrderByDescending(blog => blog.CreateAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
+        public async Task<Blog> GetActiveBlogByIdAsync(int id)
         {
             var blog = await _context.Blogs
                 .Where(b => b.IsActived == true)
@@ -58,6 +68,20 @@ namespace Infrastructure.Repository.BlogRepo
             _context.Update(blog);
             await _context.SaveChangesAsync();
             return blog;
+        }
+
+        public async Task<Blog> GetBlogByIdAsync(int id)
+        {
+            var blog = await _context.Blogs
+                .Include(b => b.Author)
+                .FirstOrDefaultAsync(b => b.Id == id);
+            return blog;
+        }
+
+        public async Task<int> CountAllAsync()
+        {
+            var count = await _context.Blogs.CountAsync();
+            return count;
         }
     }
 }
