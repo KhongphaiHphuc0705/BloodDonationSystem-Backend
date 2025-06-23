@@ -17,6 +17,9 @@ namespace Application.Service.VolunteerServ
             if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out Guid creatorId))
                 throw new UnauthorizedAccessException("User not found or invalid");
 
+            if (request.LastDonation >= DateTime.Now.AddDays(-90))
+                return null;
+
             var user = await _repoUser.GetUserByIdAsync(creatorId);
             if (user != null && user.LastDonation == null)
             {
