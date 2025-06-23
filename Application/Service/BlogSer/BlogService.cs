@@ -88,7 +88,18 @@ namespace Application.Service.BlogSer
 
         public async Task<BlogResponseDTO> GetBlogByIdAsync(int id)
         {
-            var blog = await _blogRepository.GetBlogByIdAsync(id);
+            var userRole = _contextAccessor.HttpContext?.User.FindFirst(ClaimTypes.Role)?.Value;
+
+            Blog blog;
+
+            if (userRole == "Staff")
+            {
+                blog = await _blogRepository.GetBlogByIdAsync(id);
+            } else
+            {
+                blog = await _blogRepository.GetActiveBlogByIdAsync(id);
+            }
+
             if (blog == null)
             {
                 return null;
