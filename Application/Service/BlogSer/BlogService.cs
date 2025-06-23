@@ -74,6 +74,7 @@ namespace Application.Service.BlogSer
                     Content = b.Content,
                     CreateAt = b.CreateAt,
                     LastUpdate = b.LastUpdate,
+                    IsActived = b.IsActived,
                     Author = b.Author.LastName + " " + b.Author.FirstName,
                 }).ToList();
 
@@ -111,6 +112,7 @@ namespace Application.Service.BlogSer
                 Content = blog.Content,
                 CreateAt = blog.CreateAt,
                 LastUpdate = blog.LastUpdate,
+                IsActived = blog.IsActived,
                 Author = blog.Author.LastName + " " + blog.Author.FirstName,
             };
         }
