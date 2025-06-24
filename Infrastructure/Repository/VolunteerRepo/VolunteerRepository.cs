@@ -8,7 +8,6 @@ namespace Infrastructure.Repository.VolunteerRepo
     {
         public VolunteerRepository(BloodDonationSystemContext context) : base(context)
         {
-
         }
     }
 }
