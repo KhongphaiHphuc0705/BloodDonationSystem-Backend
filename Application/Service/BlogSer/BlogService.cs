@@ -127,6 +127,7 @@ namespace Application.Service.BlogSer
 
             existingBlog.Title = blogDTO.Title;
             existingBlog.Content = blogDTO.Content;
+            existingBlog.IsActived = true;
             existingBlog.LastUpdate = DateTime.Now;
 
             var updated = await _blogRepository.UpdateBlogAsync(existingBlog);
