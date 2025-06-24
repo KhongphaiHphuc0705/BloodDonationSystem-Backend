@@ -141,7 +141,7 @@ namespace Application.Service.Users
             return new ProfileDTO
             {
                 Name = $"{existingUser.LastName} {existingUser.FirstName}",
-                Phone = existingUser.Phone,
+                Phone = existingUser.Phone, 
                 Gmail = existingUser.Gmail,
                 Gender = existingUser.Gender,
                 Dob = existingUser.Dob,
