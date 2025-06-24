@@ -1,9 +1,11 @@
 ﻿using Application.Service.BloodTypeServ;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BloodDonationSystem.Controllers
 {
+    [EnableCors("LocalPolicy")]
     [ApiController]
     public class BloodTypeController(IBloodTypeService _bloodTypeService) : ControllerBase
     {
