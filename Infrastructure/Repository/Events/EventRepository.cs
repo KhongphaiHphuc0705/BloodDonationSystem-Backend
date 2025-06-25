@@ -13,7 +13,7 @@ namespace Infrastructure.Repository.Events
             return newEvent; // Return the newly added event
         }
 
-        public async Task<int> CountAllAsync()
+        public async Task<int> CountAllEventAsync()
         {
             var count = await _context.Events.CountAsync();
             return count; // Return the total count of events
