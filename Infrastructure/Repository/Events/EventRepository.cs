@@ -15,8 +15,14 @@ namespace Infrastructure.Repository.Events
 
         public async Task<int> CountAllAsync()
         {
-            var count = await _context.Events.Where(e => e.IsExpired == false).CountAsync();
+            var count = await _context.Events.CountAsync();
             return count; // Return the total count of events
+        }
+
+        public async Task<int> CountAllActiveEventAsync()
+        {
+            var count = await _context.Events.Where(e => e.IsExpired == false).CountAsync();
+            return count; // Return the count of all active events
         }
 
         //Tach pagination ra
@@ -45,6 +51,17 @@ namespace Infrastructure.Repository.Events
         public async Task<List<Event>> GetAllEventAsync(int pageNumber, int pageSize)
         {
             return await _context.Events
+                .Include(e => e.BloodType) // Include related BloodType entity if needed
+                .OrderByDescending(e => e.CreateAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
+        public async Task<List<Event>> GetAllActiveEventAsync(int pageNumber, int pageSize)
+        {
+            return await _context.Events
+                .Where(e => e.IsExpired == false)
                 .Include(e => e.BloodType) // Include related BloodType entity if needed
                 .OrderByDescending(e => e.CreateAt)
                 .Skip((pageNumber - 1) * pageSize)
