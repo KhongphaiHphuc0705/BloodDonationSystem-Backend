@@ -84,6 +84,11 @@ namespace Application.Service.Events
             return existEvent;
         }
 
+        public async Task<int> ExpireEventsAsync()
+        {
+            return await _eventRepository.EventExpiredAsync();
+        }
+
         public async Task<PaginatedResult<EventDTO>> GetAllEventAsync(int pageNumber, int pageSize)
         {
             var totalItems = await _eventRepository.CountAllAsync();

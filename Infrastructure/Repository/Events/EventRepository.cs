@@ -64,5 +64,20 @@ namespace Infrastructure.Repository.Events
             await _context.SaveChangesAsync();
             return updateEvent; // Return the updated event
         }
+
+        public async Task<int> EventExpiredAsync()
+        {
+            var today = DateOnly.FromDateTime(DateTime.Now);
+            var expiredEvents = _context.Events
+                .Where(e => e.EventTime < today && !e.IsExpired)
+                .ToListAsync();
+
+            foreach (var expiredEvent in expiredEvents.Result)
+            {
+                expiredEvent.IsExpired = true;
+            }
+
+            return await _context.SaveChangesAsync();
+        }
     }
 }

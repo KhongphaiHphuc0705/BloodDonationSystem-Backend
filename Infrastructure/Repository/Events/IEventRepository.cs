@@ -20,5 +20,7 @@ namespace Infrastructure.Repository.Events
         Task<Event?> GetEventByIdAsync(int eventId);
 
         Task<Event> UpdateEventAsync(Event updateEvent);
+
+        Task<int> EventExpiredAsync();
     }
 }
