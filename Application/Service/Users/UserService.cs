@@ -44,15 +44,15 @@ namespace Application.Service.Users
             return banUser > 0;
         }
 
-        public async Task<bool> DeactiveUserAsync(Guid userId)
+        public async Task<bool> DeactiveUserAsync()
         {
-            var user = _contextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
-            if (user == null || !Guid.TryParse(user, out Guid parsedUserId) || parsedUserId != userId)
+            var userId = _contextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
+            if (userId == null || !Guid.TryParse(userId, out Guid parsedUserId))
             {
                 // Log or handle the case where the user ID is invalid or does not match
                 return false; // Unauthorized access or invalid user ID
             }
-            var deactiveUser = await _userRepository.DeactiveUserAsync(userId);
+            var deactiveUser = await _userRepository.DeactiveUserAsync(parsedUserId);
             if (deactiveUser <= 0)
             {
                 // Log or handle the case where no user was deactivated
