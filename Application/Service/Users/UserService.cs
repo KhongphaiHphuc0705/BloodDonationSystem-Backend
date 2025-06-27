@@ -6,6 +6,7 @@ using Infrastructure.Repository.Auth;
 using Infrastructure.Repository.Blood;
 using Infrastructure.Repository.Users;
 using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
 
 namespace Application.Service.Users
 {
@@ -52,6 +53,14 @@ namespace Application.Service.Users
                 // Log or handle the case where the user ID is invalid or does not match
                 return false; // Unauthorized access or invalid user ID
             }
+
+            var role = _contextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.Role)?.Value;
+
+            if (role == "Admin")
+            {
+                return false; // Admins cannot deactive themselves
+            }
+
             var deactiveUser = await _userRepository.DeactiveUserAsync(parsedUserId);
             if (deactiveUser <= 0)
             {

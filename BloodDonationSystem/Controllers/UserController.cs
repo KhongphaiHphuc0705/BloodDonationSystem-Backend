@@ -40,7 +40,7 @@ namespace BloodDonationSystem.Controllers
                 return BadRequest(new
                 {
                     IsSuccess = false,
-                    Message = "User may not exist or is already deactivated."
+                    Message = "Failed to deactive user."
                 });
             }
             return Ok(new
