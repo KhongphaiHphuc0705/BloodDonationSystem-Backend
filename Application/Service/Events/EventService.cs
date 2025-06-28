@@ -2,14 +2,17 @@
 using Domain.Entities;
 using Infrastructure.Helper;
 using Infrastructure.Repository.Blood;
+using Infrastructure.Repository.BloodRegistrationRepo;
 using Infrastructure.Repository.Events;
 using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
 
 namespace Application.Service.Events
 {
     public class EventService(IEventRepository _eventRepository, 
                             IHttpContextAccessor _contextAccessor,
-                            IBloodTypeRepository _bloodRepository) : IEventService
+                            IBloodTypeRepository _bloodRepository,
+                            IBloodRegistrationRepository _bloodRegisRepo) : IEventService
     {
         public async Task<Event?> AddEventAsync(NormalEventDTO eventRequest)
         {
@@ -84,20 +87,41 @@ namespace Application.Service.Events
             return existEvent;
         }
 
+        public async Task<int> ExpireEventsAsync()
+        {
+            return await _eventRepository.EventExpiredAsync();
+        }
+
         public async Task<PaginatedResult<EventDTO>> GetAllEventAsync(int pageNumber, int pageSize)
         {
-            var totalItems = await _eventRepository.CountAllAsync();
-            var events = await _eventRepository.GetAllEventAsync(pageNumber, pageSize);
+            var userRole = _contextAccessor.HttpContext?.User.FindFirst(ClaimTypes.Role)?.Value;
+
+            int totalItems;
+            IEnumerable<Event> events;
+
+            if (userRole == "Staff")
+            {
+                totalItems = await _eventRepository.CountAllEventAsync();
+                events = await _eventRepository.GetAllEventAsync(pageNumber, pageSize);
+            }
+            else
+            {
+                totalItems = await _eventRepository.CountAllActiveEventAsync();
+                events = await _eventRepository.GetAllActiveEventAsync(pageNumber, pageSize);
+            }
 
             var eventDTOs = events.Select(e => new EventDTO
             {
+                Id = e.Id,
                 Title = e.Title,
                 MaxOfDonor = e.MaxOfDonor,
                 EstimatedVolume = e.EstimatedVolume,
                 EventTime = e.EventTime,
                 IsUrgent = e.IsUrgent,
                 BloodType = e.BloodType?.Type,
-                BloodComponent = e.BloodComponent?.ToString()
+                BloodComponent = e.BloodComponent?.ToString(),
+                BloodRegisCount = _bloodRegisRepo.GetAllAsync().Result
+                                        .Where(br => br.EventId == e.Id).Count()
             }).ToList();
 
             

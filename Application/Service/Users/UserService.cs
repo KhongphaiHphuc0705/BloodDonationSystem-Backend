@@ -124,6 +124,11 @@ namespace Application.Service.Users
             }
 
             var existingUser = await _userRepository.GetUserByIdAsync(userId);
+            if (existingUser == null || existingUser.Phone == updateUser.Phone || existingUser.Gmail == updateUser.Gmail)
+            {
+                // Log or handle the case where the user was not found
+                return null; // User not found or already has the same phone or email
+            }
             //var bloodType = await _bloodRepository.GetBloodTypeByNameAsync(updateUser.BloodTypeId);
 
             existingUser.FirstName = updateUser.FirstName;

@@ -9,6 +9,7 @@ namespace Application.DTO.EventsDTO
 {
     public class EventDTO
     {
+        public int Id { get; set; }
         public string Title { get; set; }
         public int MaxOfDonor { get; set; }
         public double EstimatedVolume { get; set; }
@@ -17,5 +18,6 @@ namespace Application.DTO.EventsDTO
         public DateOnly EventTime { get; set; }
         public string? BloodType { get; set; } = null;
         public string? BloodComponent { get; set; } = null;
+        public int BloodRegisCount { get; set; }
     }
 }

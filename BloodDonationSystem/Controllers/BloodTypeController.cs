@@ -15,9 +15,18 @@ namespace BloodDonationSystem.Controllers
             var bloodTypes = await _bloodTypeService.GetAllBloodTypesAsync();
             if (bloodTypes == null || !bloodTypes.Any())
             {
-                return NotFound(new { Message = "No blood types found." });
+                return NotFound(new 
+                { 
+                    IsSuccess = false,
+                    Message = "No blood types found." 
+                });
             }
-            return Ok(bloodTypes);
+            return Ok(new
+            {
+                IsSuccess = true,
+                Message = "Blood types retrieved successfully.",
+                Data = bloodTypes
+            });
         }
     }
 }
