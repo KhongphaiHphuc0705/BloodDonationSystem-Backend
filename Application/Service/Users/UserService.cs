@@ -73,14 +73,15 @@ namespace Application.Service.Users
 
         public async Task<PaginatedResult<ListUserDTO>> GetAllUserAsync(int pageNumber, int pageSize)
         {
-            var totalItems = await _userRepository.CountAllAsync();
+            var totalItems = await _userRepository.CountAllActiveUserAsync();
             var users = await _userRepository.GetAllUserAsync(pageNumber, pageSize);
 
             var userDtos = users.Select(u => new ListUserDTO
             {
+                UserId = u.Id,
                 Name = $"{u.LastName} {u.FirstName}",
+                Phone = u.Phone,
                 Email = u.Gmail,
-                Status = u.Status.ToString(),
                 Dob = u.Dob,
                 Role = u.Role.RoleName
             }).ToList();
