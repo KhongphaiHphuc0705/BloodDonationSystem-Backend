@@ -50,23 +50,23 @@ namespace BloodDonationSystem.Controllers
             });
         }
 
-        [Authorize(Roles = "Admin")]
-        [HttpPut("api/users/{userId}/assign-role")]
-        public async Task<IActionResult> AssignUserRole(Guid userId, int roleId)
-        {
-            var user = await _userService.AssignUserRole(userId, roleId);
-            if (user == null)
-            {
-                return BadRequest(new
-                {
-                    Message = "Cannot assign role to this user"
-                });
-            }
-            return Ok(new
-            {
-                Message = "Assign role successfully"
-            });
-        }
+        //[Authorize(Roles = "Admin")]
+        //[HttpPut("api/users/{userId}/assign-role")]
+        //public async Task<IActionResult> AssignUserRole(Guid userId, int roleId)
+        //{
+        //    var user = await _userService.AssignUserRole(userId, roleId);
+        //    if (user == null)
+        //    {
+        //        return BadRequest(new
+        //        {
+        //            Message = "Cannot assign role to this user"
+        //        });
+        //    }
+        //    return Ok(new
+        //    {
+        //        Message = "Assign role successfully"
+        //    });
+        //}
 
         [Authorize(Roles = "Admin")]
         [HttpGet("api/users")]
@@ -186,27 +186,36 @@ namespace BloodDonationSystem.Controllers
                 Data = updatedProfile
             });
         }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost("add-staff")]
+        public async Task<IActionResult> AddStaffAsync([FromBody] UserDTO request)
+        {
+            if (request == null)
+            {
+                return BadRequest(new
+                {
+                    IsSuccess = false,
+                    Message = "Invalid user data."
+                });
+            }
+            var user = await _userService.AddStaffAsync(request);
+            if (user == null)
+            {
+                return BadRequest(new
+                {
+                    IsSuccess = false,
+                    Message = "User already exists with the provided phone number."
+                });
+            }
+            return Ok(new
+            {
+                IsSuccess = true,
+                Message = "Staff added successfully.",
+            });
+        }
     }
 }
 
 
 
-//[Authorize(Roles = "Admin")]
-//[HttpPost("add-staff")]
-//public async Task<IActionResult> AddStaffAsync([FromBody] UserDTO request)
-//{
-//    if (request == null)
-//    {
-//        return BadRequest("Invalid user data.");
-//    }
-//    var user = await _userService.AddStaffAsync(request);
-//    if (user == null)
-//    {
-//        return BadRequest("User already exists with the provided phone number.");
-//    }
-//    return Ok(new
-//    {
-//        Message = "Staff added successfully.",
-//        User = user
-//    });
-//}
