@@ -161,16 +161,8 @@ namespace BloodDonationSystem.Controllers
             {
                 return BadRequest("Invalid user.");
             }
-            var userId = User.FindFirst("UserId")?.Value;
-            if (userId == null)
-            {
-                return Unauthorized(new
-                {
-                    IsSuccess = false,
-                    Message = "User not authenticated."
-                });
-            }
-            var updatedProfile = await _userService.UpdateUserAsync(Guid.Parse(userId), updateUser);
+
+            var updatedProfile = await _userService.UpdateUserAsync(id, updateUser);
             if (updatedProfile == null)
             {
                 return NotFound(new

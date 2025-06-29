@@ -176,14 +176,8 @@ namespace Application.Service.Users
                 return null;
             }
 
-            var role = _contextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.Role)?.Value;
-            if(role == "Admin")
-            {
-                return null;
-            }
-
             var existingUser = await _userRepository.GetUserByIdAsync(userId);
-            if (existingUser == null)
+            if (existingUser == null || existingUser.RoleId == 1)
             {
                 return null;
             }
