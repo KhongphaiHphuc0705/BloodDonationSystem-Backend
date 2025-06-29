@@ -124,19 +124,52 @@ namespace Application.Service.Users
             };
         }
 
+        public async Task<UpdateUserDTO> UpdateUserAsync(Guid userId, UpdateUserDTO update)
+        {
+            var id = _contextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
+            if (id == null || !Guid.TryParse(id, out Guid parsedUserId))
+            {
+                return null;
+            }
+
+            var role = _contextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.Role)?.Value;
+            if(role == "Admin")
+            {
+                return null;
+            }
+
+            var existingUser = await _userRepository.GetUserByIdAsync(userId);
+            if (existingUser == null)
+            {
+                return null;
+            }
+
+            existingUser.FirstName = update.FirstName;
+            existingUser.LastName = update.LastName;
+            existingUser.Dob = update.Dob;
+            existingUser.UpdateBy = parsedUserId;
+            existingUser.UpdateAt = DateTime.Now;
+
+            var updated = await _userRepository.UpdateUserProfileAsync(existingUser);
+            return new UpdateUserDTO
+            {
+                FirstName = existingUser.FirstName,
+                LastName = existingUser.LastName,
+                Dob = existingUser.Dob
+            };
+        }
+
         public async Task<ProfileDTO> UpdateUserProfileAsync(Guid userId, UserDTO updateUser)
         {
             var id = _contextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
             if (id == null || !Guid.TryParse(id, out Guid parsedUserId) || parsedUserId != userId)
             {
-                // Log or handle the case where the user ID is invalid or does not match
                 return null; // Unauthorized access or invalid user ID
             }
 
             var existingUser = await _userRepository.GetUserByIdAsync(userId);
             if (existingUser == null || existingUser.Phone == updateUser.Phone || existingUser.Gmail == updateUser.Gmail)
             {
-                // Log or handle the case where the user was not found
                 return null; // User not found or already has the same phone or email
             }
             //var bloodType = await _bloodRepository.GetBloodTypeByNameAsync(updateUser.BloodTypeId);

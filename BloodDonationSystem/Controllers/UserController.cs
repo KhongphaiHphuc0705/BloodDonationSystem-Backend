@@ -152,6 +152,40 @@ namespace BloodDonationSystem.Controllers
                 Data = updatedProfile
             });
         }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPut("/api/users")]
+        public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UpdateUserDTO updateUser)
+        {
+            if (updateUser == null)
+            {
+                return BadRequest("Invalid user.");
+            }
+            var userId = User.FindFirst("UserId")?.Value;
+            if (userId == null)
+            {
+                return Unauthorized(new
+                {
+                    IsSuccess = false,
+                    Message = "User not authenticated."
+                });
+            }
+            var updatedProfile = await _userService.UpdateUserAsync(Guid.Parse(userId), updateUser);
+            if (updatedProfile == null)
+            {
+                return NotFound(new
+                {
+                    IsSuccess = false,
+                    Message = "User not found or could not be updated."
+                });
+            }
+            return Ok(new
+            {
+                IsSuccess = true,
+                Message = "User profile updated successfully.",
+                Data = updatedProfile
+            });
+        }
     }
 }
 

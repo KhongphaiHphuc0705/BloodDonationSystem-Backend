@@ -18,6 +18,8 @@ namespace Application.Service.Users
         Task<ProfileDTO> UpdateUserProfileAsync(Guid userId, UserDTO updateUser);
         Task<bool> DeactiveUserAsync();
         Task<bool> BanUserAsync(Guid userId);
+
+        Task<UpdateUserDTO> UpdateUserAsync(Guid userId, UpdateUserDTO update);
         //Task<User> AddStaffAsync (UserDTO request);
     }
 }
