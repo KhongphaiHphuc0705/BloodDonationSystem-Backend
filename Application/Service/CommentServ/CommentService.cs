@@ -68,6 +68,11 @@ namespace Application.Service.CommentServ
         {
             var comment = await _commentRepository.GetCommentByIdAsync(id);
 
+            if(comment == null)
+            {
+                return null;
+            }
+
             return new CommentResponseDTO
             {
                 Id = comment.Id,
@@ -96,6 +101,8 @@ namespace Application.Service.CommentServ
             existingComment.IsLegit = false;
             existingComment.UpdateAt = DateTime.Now;
             existingComment.StaffId = parsedUserId;
+
+            var update = _commentRepository.ModerateCommentAsync(id);
 
             return new CommentResponseDTO
             {
