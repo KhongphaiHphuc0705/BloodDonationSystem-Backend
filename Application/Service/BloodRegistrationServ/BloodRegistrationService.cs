@@ -14,6 +14,7 @@ namespace Application.Service.BloodRegistrationServ
         IEventRepository _repoEvent, IUserRepository _repoUser, 
         IBloodTypeRepository _repoBloodType) : IBloodRegistrationService
     {
+
         public async Task<ApiResponse<BloodRegistration>?> RegisterDonation(int eventId, BloodRegistrationRequest request)
         {
             ApiResponse<BloodRegistration> apiResponse = new();
@@ -44,6 +45,7 @@ namespace Application.Service.BloodRegistrationServ
             if (user == null)
                 return null;
 
+
             // Kiểm tra member chỉ được đăng ký hiến máu 1 lần vào 1 event 
             var checkedRegis = _repository.GetAllAsync().Result
                 .FirstOrDefault(br => br.MemberId == user.Id);
@@ -66,6 +68,7 @@ namespace Application.Service.BloodRegistrationServ
                 return apiResponse;  // Request xuống đều có LastDonation nên không cần xét trong hệ thống
             }
 
+
             await _repoUser.UpdateUserProfileAsync(user);
 
             var bloodRegis = new BloodRegistration
@@ -79,6 +82,7 @@ namespace Application.Service.BloodRegistrationServ
             apiResponse.IsSuccess = true;
             apiResponse.Message = "Register donation successfully.";
             return apiResponse;
+
         }
 
         public async Task<BloodRegistration?> RejectBloodRegistration(int bloodRegisId)
@@ -113,6 +117,11 @@ namespace Application.Service.BloodRegistrationServ
                 apiResponse.Message = "Blood registration not suitable.";
                 return apiResponse;
             }
+
+            // Không được hủy vào ngày diễn ra sự kiện
+            var checkedEvent = await _repoEvent.GetEventByIdAsync(bloodRegistration.EventId);
+            if (checkedEvent != null && checkedEvent.EventTime == DateOnly.FromDateTime(DateTime.Now))
+                return null;
 
             var userId = _contextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
             if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out Guid creatorId))
