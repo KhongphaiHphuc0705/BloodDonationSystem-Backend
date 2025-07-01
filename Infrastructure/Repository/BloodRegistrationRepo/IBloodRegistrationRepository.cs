@@ -9,5 +9,6 @@ namespace Infrastructure.Repository.BloodRegistrationRepo
         Task<PaginatedResult<BloodRegistration>> GetPagedAsync(int eventId, int pageNumber, int pageSize);
 
         Task<List<BloodRegistration>> GetBloodRegistrationHistoryAsync(Guid userId);
+        Task<List<BloodRegistration>> GetVolunteerRegistrationHistoryAsync(Guid userId);
     }
 }

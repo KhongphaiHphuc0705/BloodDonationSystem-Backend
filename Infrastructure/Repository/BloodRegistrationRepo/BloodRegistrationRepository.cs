@@ -18,7 +18,7 @@ namespace Infrastructure.Repository.BloodRegistrationRepo
                                         .Include(br => br.Event)
                                         .ThenInclude(e => e.Facility)
                                         .OrderByDescending(e => e.CreateAt)
-                                        .Where(br => br.MemberId == userId)
+                                        .Where(br => br.MemberId == userId && br.VolunteerId == null)
                                         .ToListAsync();
         }
 
@@ -40,6 +40,17 @@ namespace Infrastructure.Repository.BloodRegistrationRepo
                 TotalItems = await _dbSet.CountAsync(br => br.EventId == eventId)
             };
             return pagedResult;
+        }
+
+        public async Task<List<BloodRegistration>> GetVolunteerRegistrationHistoryAsync(Guid userId)
+        {
+            return await _context.BloodRegistrations
+                                        .Include(br => br.Event)
+                                        .ThenInclude(e => e.Facility)
+                                        .Include(br => br.Volunteer)
+                                        .OrderByDescending(e => e.CreateAt)
+                                        .Where(br => br.Volunteer.MemberId == userId)
+                                        .ToListAsync();
         }
     }
 }
