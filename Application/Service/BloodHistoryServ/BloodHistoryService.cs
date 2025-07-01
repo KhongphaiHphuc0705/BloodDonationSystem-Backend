@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace Application.Service.BloodHistoryServ
 {
     public class BloodHistoryService(IBloodRegistrationRepository _bloodRegistration,
-                                     IBloodInventoryRepository _inventoryRegistration,
+                                     IVolunteerRepository _volunteerRepository,
                                      IHttpContextAccessor _contextAccessor) : IBloodHistoryService
     {
         public async Task<List<UnifiedBloodHistory>> GetBloodRegistraionHistoryAsync()
@@ -97,6 +97,23 @@ namespace Application.Service.BloodHistoryServ
             }).ToList();
 
             return donation;
+        }
+
+        public async Task<bool> UpdateAvailableDateVolunteerAsync(int id, UpdateAvailableDateDTO dto)
+        {
+            var userId = _contextAccessor.HttpContext?.User?.FindFirst("UserId").Value;
+            if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out Guid uId))
+            {
+                return false;
+            }
+
+            var updated = await _volunteerRepository.UpdateAvailableDateAsync(id, dto.StartDate, dto.EndDate);
+            if (!updated)
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }

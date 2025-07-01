@@ -11,5 +11,7 @@ namespace Application.Service.BloodHistoryServ
     {
         Task<List<UnifiedBloodHistory>> GetBloodRegistraionHistoryAsync();
         Task<List<DonationHistory>> GetDonationHistoryAsync();
+
+        Task<bool> UpdateAvailableDateVolunteerAsync(int id, UpdateAvailableDateDTO dto);
     }
 }
