@@ -172,7 +172,7 @@ namespace Application.Service.BloodProcedureServ
             // Set ngày hết hạn dựa trên Blood Component
             if (bloodProcedure.BloodComponent == BloodComponent.WholeBlood || bloodProcedure.BloodComponent == BloodComponent.RedBloodCells)
             {
-                bloodInventory.ExpiredDate = bloodProcedure.PerformedAt.AddDays(42);
+                bloodInventory.ExpiredDate = bloodProcedure.PerformedAt.AddDays(35);
             }
 
             if (bloodProcedure.BloodComponent == BloodComponent.Plasma)

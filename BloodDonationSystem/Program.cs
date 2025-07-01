@@ -2,6 +2,7 @@ using Application.DTO.SendEmailDTO;
 using Application.Service.Auth;
 using Application.Service.BlogSer;
 using Application.Service.BloodCompatibilitySer;
+using Application.Service.BloodInventoryServ;
 using Application.Service.BloodProcedureServ;
 using Application.Service.BloodRegistrationServ;
 using Application.Service.BloodTypeServ;
@@ -48,18 +49,23 @@ builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddScoped<IBloodRegistrationRepository, BloodRegistrationRepository>();
 builder.Services.AddScoped<IBloodRegistrationService, BloodRegistrationService>();
+
 builder.Services.AddScoped<IHealthProcedureRepository, HealthProcedureRepository>();
 builder.Services.AddScoped<IHealthProcedureService, HealthProcedureService>();
+
 builder.Services.AddScoped<IBloodProcedureRepository, BloodProcedureRepository>();
 builder.Services.AddScoped<IBloodProcedureService, BloodProcedureService>();
+
 builder.Services.AddScoped<IBloodInventoryRepository, BloodInventoryRepository>();
+builder.Services.AddScoped<IBloodInventoryService, BloodInventoryService>();
+
 builder.Services.AddScoped<IVolunteerRepository,VolunteerRepository>();
 builder.Services.AddScoped<IVolunteerService, VolunteerService>();
+
 builder.Services.AddScoped<IFacilityRepository, FacilityRepository>();
+
 builder.Services.AddScoped<IBloodTypeRepository, BloodTypeRepository>();
 builder.Services.AddScoped<IBloodTypeService, BloodTypeService>();
-builder.Services.AddScoped<IVolunteerRepository, VolunteerRepository>();
-builder.Services.AddScoped<IVolunteerService, VolunteerService>();
 
 builder.Services.AddScoped<IBlogRepository, BlogRepository>();
 builder.Services.AddScoped<IBlogService, BlogService>();

@@ -118,11 +118,6 @@ namespace Application.Service.BloodRegistrationServ
                 return apiResponse;
             }
 
-            // Không được hủy vào ngày diễn ra sự kiện
-            var checkedEvent = await _repoEvent.GetEventByIdAsync(bloodRegistration.EventId);
-            if (checkedEvent != null && checkedEvent.EventTime == DateOnly.FromDateTime(DateTime.Now))
-                return null;
-
             var userId = _contextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
             if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out Guid creatorId))
             {
