@@ -113,5 +113,26 @@ namespace BloodDonationSystem.Controllers
                 Data = bloodHistory
             });
         }
+        [Authorize]
+        [HttpGet("api/donation-history")]
+        public async Task<IActionResult> GetDonationHistory()
+        {
+            var bloodHistory = await _historyService.GetDonationHistoryAsync();
+
+            if (bloodHistory == null)
+            {
+                return NotFound(new
+                {
+                    IsSuccess = false,
+                    Message = "Cannot found any record"
+                });
+            }
+            return Ok(new
+            {
+                IsSuccess = true,
+                Message = "History retrieve successfully",
+                Data = bloodHistory
+            });
+        }
     }
 }

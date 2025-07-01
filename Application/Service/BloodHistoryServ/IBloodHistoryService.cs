@@ -10,5 +10,6 @@ namespace Application.Service.BloodHistoryServ
     public interface IBloodHistoryService
     {
         Task<List<UnifiedBloodHistory>> GetBloodRegistraionHistoryAsync();
+        Task<List<DonationHistory>> GetDonationHistoryAsync();
     }
 }

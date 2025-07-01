@@ -22,6 +22,17 @@ namespace Infrastructure.Repository.BloodRegistrationRepo
                                         .ToListAsync();
         }
 
+        public async Task<List<BloodRegistration>> GetDonationHistoryAsync(Guid userId)
+        {
+            return await _context.BloodRegistrations
+                .Include(br => br.Event)
+                .ThenInclude(e => e.Facility)
+                .Include(br => br.BloodProcedure)
+                .Include(br => br.HealthProcedure)
+                .Include(br => br.BloodInventory)
+                .ToListAsync();
+        }
+
         public async Task<PaginatedResult<BloodRegistration>> GetPagedAsync(int eventId, int pageNumber, int pageSize)
         {
              var bloodRegistrations = await _dbSet
