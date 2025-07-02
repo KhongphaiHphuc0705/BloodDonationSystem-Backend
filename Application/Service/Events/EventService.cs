@@ -145,6 +145,25 @@ namespace Application.Service.Events
             return eventItem;
         }
 
+        public async Task<PaginatedResult<ListWaitingForBloodProcedure>> GetPassedHealthProcedureAsync(int pageNumber, int pageSize)
+        {
+            var events = await _eventRepository.GetPassedHealthProcedureAsync(pageNumber, pageSize);
+
+            var dto = events.Select(e => new ListWaitingForBloodProcedure
+            {
+                Id = e.Id,
+                Name = e.Title,
+                Total = e.BloodRegistrations.Count,
+            }).ToList();
+
+            return new PaginatedResult<ListWaitingForBloodProcedure>
+            {
+                Items = dto,
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            };
+        }
+
         public async Task<EventDTO> UpdateEventAsync(int eventId, EventDTO updateEvent)
         {
             var userId = _contextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;

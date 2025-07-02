@@ -2,6 +2,8 @@ using Application.DTO.SendEmailDTO;
 using Application.Service.Auth;
 using Application.Service.BlogSer;
 using Application.Service.BloodCompatibilitySer;
+using Application.Service.BloodHistoryServ;
+using Application.Service.BloodInventoryServ;
 using Application.Service.BloodProcedureServ;
 using Application.Service.BloodRegistrationServ;
 using Application.Service.BloodTypeServ;

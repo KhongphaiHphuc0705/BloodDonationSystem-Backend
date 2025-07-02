@@ -17,5 +17,7 @@ namespace Application.Service.Events
         Task<Event> DeleteEventAsync(int eventId);
 
         Task<int> ExpireEventsAsync();
+
+        Task<PaginatedResult<ListWaitingForBloodProcedure>> GetPassedHealthProcedureAsync(int pageNumber, int pageSize);
     }
 }

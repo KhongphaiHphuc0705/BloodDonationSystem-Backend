@@ -96,5 +96,13 @@ namespace Infrastructure.Repository.Events
 
             return await _context.SaveChangesAsync();
         }
+
+        public async Task<List<Event>> GetPassedHealthProcedureAsync(int pageNumber, int pageSize)
+        {
+            var events = await _context.Events
+                .Include(e => e.BloodRegistrations.Where(br => br.HealthId != null && br.IsApproved == true && br.BloodProcedureId == null))
+                .ToListAsync();
+            return events;
+        }
     }
 }
