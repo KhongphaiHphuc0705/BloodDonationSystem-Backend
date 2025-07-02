@@ -32,7 +32,9 @@ namespace Application.Service.BloodHistoryServ
 
             if(bloodRegistrations != null)
             {
-                var donationHistory = bloodRegistrations.Select(b => new UnifiedBloodHistory
+                var donationHistory = bloodRegistrations
+                    .Where(b => b.HealthProcedure == null)
+                    .Select(b => new UnifiedBloodHistory
                 {
                     Id = b.Id,
                     Type = "Donation",
@@ -82,6 +84,7 @@ namespace Application.Service.BloodHistoryServ
 
             var donation = donationHistory.Select(br => new DonationHistory
             {
+                RegistrationId = br.Id,
                 DonateDate = br.Event.EventTime,
                 FacilityName = br.Event.Facility.Name,
                 FacilityAddress = br.Event.Facility.Address,
@@ -89,7 +92,8 @@ namespace Application.Service.BloodHistoryServ
                 Latitude = br.Event.Facility.Latitude,
                 Status = br.IsApproved,
                 Volume = br.BloodInventory?.Volume,
-                Description = br.BloodInventory != null ? "Hiến máu thành công"
+                Description = br.IsApproved == true ? (br.BloodInventory != null ? "Hiến máu thành công" : "Chờ hiến máu")
+                            : br.IsApproved == false ? "Bị từ chối"
                             : br.HealthProcedure?.IsHealth == false ? br.HealthProcedure?.Description
                             : br.BloodProcedure?.IsQualified == false ? br.BloodProcedure?.Description
                             : br.Event.EventTime > DateOnly.FromDateTime(DateTime.Now) ? "Chưa đến thời gian hiến máu"
