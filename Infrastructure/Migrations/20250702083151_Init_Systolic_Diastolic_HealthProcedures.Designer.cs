@@ -12,13 +12,9 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(BloodDonationSystemContext))]
-<<<<<<<< HEAD:Infrastructure/Migrations/20250701035101_Init_DEL.Designer.cs
-    [Migration("20250701035101_Init_DEL")]
-    partial class Init_DEL
-========
+
     [Migration("20250702083151_Init_Systolic_Diastolic_HealthProcedures")]
     partial class Init_Systolic_Diastolic_HealthProcedures
->>>>>>>> dev:Infrastructure/Migrations/20250702083151_Init_Systolic_Diastolic_HealthProcedures.Designer.cs
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
