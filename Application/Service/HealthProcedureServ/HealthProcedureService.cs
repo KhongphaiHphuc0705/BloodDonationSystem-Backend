@@ -108,7 +108,8 @@ namespace Application.Service.HealthProcedureServ
 
             var healthProcedure = new HealthProcedure
             {
-                Pressure = request.Pressure,
+                Systolic = request.Systolic,
+                Diastolic = request.Diastolic,
                 Temperature = request.Temperature,
                 Hb = request.Hb,
                 HBV = request.HBV,

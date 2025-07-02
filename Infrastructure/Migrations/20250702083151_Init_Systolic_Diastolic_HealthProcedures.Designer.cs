@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(BloodDonationSystemContext))]
-    [Migration("20250617014625_Init_IsApproved_BloodRegistration")]
-    partial class Init_IsApproved_BloodRegistration
+    [Migration("20250702083151_Init_Systolic_Diastolic_HealthProcedures")]
+    partial class Init_Systolic_Diastolic_HealthProcedures
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -66,9 +66,6 @@ namespace Infrastructure.Migrations
                     b.Property<int>("Id")
                         .HasColumnType("int");
 
-                    b.Property<int>("BloodTypeId")
-                        .HasColumnType("int");
-
                     b.Property<int>("DonorTypeId")
                         .HasColumnType("int");
 
@@ -78,9 +75,7 @@ namespace Infrastructure.Migrations
                     b.Property<int>("BloodComponent")
                         .HasColumnType("int");
 
-                    b.HasKey("Id", "BloodTypeId", "DonorTypeId", "RecipientTypeId");
-
-                    b.HasIndex("BloodTypeId");
+                    b.HasKey("Id", "DonorTypeId", "RecipientTypeId");
 
                     b.HasIndex("DonorTypeId");
 
@@ -117,6 +112,9 @@ namespace Infrastructure.Migrations
 
                     b.Property<Guid?>("RemoveBy")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdateAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<float>("Volume")
                         .HasColumnType("real");
@@ -184,6 +182,9 @@ namespace Infrastructure.Migrations
 
                     b.Property<DateTime>("CreateAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("EventId")
                         .HasColumnType("int");
@@ -412,6 +413,9 @@ namespace Infrastructure.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("Diastolic")
+                        .HasColumnType("int");
+
                     b.Property<bool>("HBV")
                         .HasColumnType("bit");
 
@@ -430,7 +434,7 @@ namespace Infrastructure.Migrations
                     b.Property<Guid>("PerformedBy")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("Pressure")
+                    b.Property<int>("Systolic")
                         .HasColumnType("int");
 
                     b.Property<float>("Temperature")
@@ -616,12 +620,6 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.BloodCompatibility", b =>
                 {
-                    b.HasOne("Domain.Entities.BloodType", "BloodType")
-                        .WithMany()
-                        .HasForeignKey("BloodTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Domain.Entities.BloodType", "DonorType")
                         .WithMany("Donors")
                         .HasForeignKey("DonorTypeId")
@@ -633,8 +631,6 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("RecipientTypeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("BloodType");
 
                     b.Navigation("DonorType");
 
