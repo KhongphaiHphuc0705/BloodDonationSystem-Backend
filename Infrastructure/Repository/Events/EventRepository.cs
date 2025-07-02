@@ -100,12 +100,41 @@ namespace Infrastructure.Repository.Events
         public async Task<List<Event>> GetPassedHealthProcedureAsync(int pageNumber, int pageSize)
         {
             var events = await _context.Events
+                .Where(e => e.IsExpired == false)
                 .Include(e => e.BloodRegistrations.Where(br => br.HealthId != null && br.IsApproved == true && br.BloodProcedureId == null))
                 .OrderByDescending(e => e.CreateAt)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
             return events;
+        }
+
+        public async Task<List<Event>> GetEventListDoBloodProcedure(int pageNumber, int pageSize)
+        {
+            var events = await _context.Events
+                .Include(e => e.BloodRegistrations)
+                .ThenInclude(br => br.BloodProcedure)
+                .ToListAsync();
+
+            var filtered = events.Select(e => new Event
+            {
+            Id = e.Id,
+            Title = e.Title,
+            EventTime = e.EventTime,
+            Facility = e.Facility,
+            BloodRegistrations = e.BloodRegistrations
+                .Where(br =>
+                    br.HealthId != null &&
+                    br.IsApproved == true &&
+                    (br.BloodProcedureId != null && br.BloodProcedure.IsQualified == null)
+                ).ToList()
+            })
+                .Where(e => e.BloodRegistrations.Any())
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            return filtered;
         }
     }
 }

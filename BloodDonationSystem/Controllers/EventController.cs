@@ -138,5 +138,27 @@ namespace BloodDonationSystem.Controllers
                 Data = events
             });
         }
+
+        [Authorize(Roles = "Staff")]
+        [HttpGet("api/events/waiting-for-qualify-blood")]
+        public async Task<IActionResult> GetWaitingListForQualifyBlood([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        {
+            var events = await _eventService.GetEventListDoBloodProcedure(pageNumber, pageSize);
+
+            if (events == null)
+            {
+                return NotFound(new
+                {
+                    IsSuccess = false,
+                    Message = "Cannot found any event"
+                });
+            }
+            return Ok(new
+            {
+                IsSuccess = true,
+                Message = "Event retrieve successfully",
+                Data = events
+            });
+        }
     }
 }

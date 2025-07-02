@@ -145,18 +145,37 @@ namespace Application.Service.Events
             return eventItem;
         }
 
-        public async Task<PaginatedResult<ListWaitingForBloodProcedure>> GetPassedHealthProcedureAsync(int pageNumber, int pageSize)
+        public async Task<PaginatedResult<ListWaiting>> GetEventListDoBloodProcedure(int pageNumber, int pageSize)
         {
-            var events = await _eventRepository.GetPassedHealthProcedureAsync(pageNumber, pageSize);
+            var events = await _eventRepository.GetEventListDoBloodProcedure(pageNumber, pageSize);
 
-            var dto = events.Select(e => new ListWaitingForBloodProcedure
+            var dto = events.Select(e => new ListWaiting
             {
                 Id = e.Id,
                 Name = e.Title,
                 Total = e.BloodRegistrations.Count,
             }).ToList();
 
-            return new PaginatedResult<ListWaitingForBloodProcedure>
+            return new PaginatedResult<ListWaiting>
+            {
+                Items = dto,
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            };
+        }
+
+        public async Task<PaginatedResult<ListWaiting>> GetPassedHealthProcedureAsync(int pageNumber, int pageSize)
+        {
+            var events = await _eventRepository.GetPassedHealthProcedureAsync(pageNumber, pageSize);
+
+            var dto = events.Select(e => new ListWaiting
+            {
+                Id = e.Id,
+                Name = e.Title,
+                Total = e.BloodRegistrations.Count,
+            }).ToList();
+
+            return new PaginatedResult<ListWaiting>
             {
                 Items = dto,
                 PageNumber = pageNumber,
