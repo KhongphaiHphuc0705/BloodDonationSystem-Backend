@@ -33,7 +33,7 @@ namespace Application.Service.BloodHistoryServ
             if(bloodRegistrations != null)
             {
                 var donationHistory = bloodRegistrations
-                    .Where(b => b.HealthProcedure == null)
+                    .Where(br => br.IsApproved == null)
                     .Select(b => new UnifiedBloodHistory
                 {
                     Id = b.Id,
@@ -82,7 +82,9 @@ namespace Application.Service.BloodHistoryServ
                 return null;
             }
 
-            var donation = donationHistory.Select(br => new DonationHistory
+            var donation = donationHistory
+                .Where(br => br.IsApproved != null)
+                .Select(br => new DonationHistory
             {
                 RegistrationId = br.Id,
                 DonateDate = br.Event.EventTime,
