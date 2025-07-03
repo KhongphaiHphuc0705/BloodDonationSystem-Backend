@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(BloodDonationSystemContext))]
+
     [Migration("20250702083151_Init_Systolic_Diastolic_HealthProcedures")]
     partial class Init_Systolic_Diastolic_HealthProcedures
     {
