@@ -152,21 +152,24 @@ namespace Infrastructure.Repository.Events
 
         public async Task<int> CountEventListDoBloodProcedure()
         {
-            var events = await _context.Events
-                .Include(e => e.BloodRegistrations)
-                    .ThenInclude(br => br.BloodProcedure)
-                .ToListAsync();
+            return await _context.Events
+                .Where(e => e.BloodRegistrations.Any(br =>
+                        br.HealthId != null &&
+                        br.IsApproved == true &&
+                        br.BloodProcedureId != null &&
+                        br.BloodProcedure.IsQualified == null))
+                .CountAsync();
 
-            var totalCount = events
-                .SelectMany(e => e.BloodRegistrations)
-                .Count(br =>
-                    br.HealthId != null &&
-                    br.IsApproved == true &&
-                    br.BloodProcedureId != null &&
-                    br.BloodProcedure?.IsQualified == null
-                );
+            //var totalCount = events
+            //    .SelectMany(e => e.BloodRegistrations)
+            //    .Count(br =>
+            //        br.HealthId != null &&
+            //        br.IsApproved == true &&
+            //        br.BloodProcedureId != null &&
+            //        br.BloodProcedure?.IsQualified == null
+            //    );
 
-            return totalCount;
+            //return totalCount;
         }
 
     }
