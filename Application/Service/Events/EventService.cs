@@ -155,7 +155,8 @@ namespace Application.Service.Events
                 Id = e.Id,
                 Name = e.Title,
                 Total = e.BloodRegistrations.Count,
-            }).ToList();
+            }).Where(e => e.Total > 0)
+              .ToList();
 
             return new PaginatedResult<ListWaiting>
             {
@@ -176,7 +177,8 @@ namespace Application.Service.Events
                 Id = e.Id,
                 Name = e.Title,
                 Total = e.BloodRegistrations.Count,
-            }).ToList();
+            }).Where(e => e.Total > 0)
+              .ToList();
 
             return new PaginatedResult<ListWaiting>
             {
