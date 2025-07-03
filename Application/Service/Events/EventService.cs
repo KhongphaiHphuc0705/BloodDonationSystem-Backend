@@ -148,6 +148,7 @@ namespace Application.Service.Events
         public async Task<PaginatedResult<ListWaiting>> GetEventListDoBloodProcedure(int pageNumber, int pageSize)
         {
             var events = await _eventRepository.GetEventListDoBloodProcedure(pageNumber, pageSize);
+            var totalItems = await _eventRepository.CountEventListDoBloodProcedure();
 
             var dto = events.Select(e => new ListWaiting
             {
@@ -158,6 +159,7 @@ namespace Application.Service.Events
 
             return new PaginatedResult<ListWaiting>
             {
+                TotalItems = totalItems,
                 Items = dto,
                 PageNumber = pageNumber,
                 PageSize = pageSize
@@ -167,6 +169,7 @@ namespace Application.Service.Events
         public async Task<PaginatedResult<ListWaiting>> GetPassedHealthProcedureAsync(int pageNumber, int pageSize)
         {
             var events = await _eventRepository.GetPassedHealthProcedureAsync(pageNumber, pageSize);
+            var totalItems = await _eventRepository.CountEventPassedHealthProcedureAsync();
 
             var dto = events.Select(e => new ListWaiting
             {
@@ -177,6 +180,7 @@ namespace Application.Service.Events
 
             return new PaginatedResult<ListWaiting>
             {
+                TotalItems = totalItems,
                 Items = dto,
                 PageNumber = pageNumber,
                 PageSize = pageSize

@@ -136,5 +136,33 @@ namespace Infrastructure.Repository.Events
 
             return filtered;
         }
+
+        public async Task<int> CountEventPassedHealthProcedureAsync()
+        {
+            return await _context.Events
+                .Where(e => e.IsExpired == false)
+                .Include(e => e.BloodRegistrations.Where(br => br.HealthId != null && br.IsApproved == true && br.BloodProcedureId == null))
+                .CountAsync();
+        }
+
+        public async Task<int> CountEventListDoBloodProcedure()
+        {
+            var events = await _context.Events
+                .Include(e => e.BloodRegistrations)
+                    .ThenInclude(br => br.BloodProcedure)
+                .ToListAsync();
+
+            var totalCount = events
+                .SelectMany(e => e.BloodRegistrations)
+                .Count(br =>
+                    br.HealthId != null &&
+                    br.IsApproved == true &&
+                    br.BloodProcedureId != null &&
+                    br.BloodProcedure?.IsQualified == null
+                );
+
+            return totalCount;
+        }
+
     }
 }

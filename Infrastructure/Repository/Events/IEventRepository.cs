@@ -25,7 +25,9 @@ namespace Infrastructure.Repository.Events
         Task<Event> UpdateEventAsync(Event updateEvent);
 
         Task<List<Event>> GetPassedHealthProcedureAsync(int pageNumber, int pageSize);
+        Task<int> CountEventPassedHealthProcedureAsync();
         Task<List<Event>> GetEventListDoBloodProcedure(int pageNumber, int pageSize);
+        Task<int> CountEventListDoBloodProcedure();
 
         Task<int> EventExpiredAsync();
     }
