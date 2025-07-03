@@ -12,5 +12,7 @@ namespace Infrastructure.Repository.BloodRegistrationRepo
         Task<List<BloodRegistration>> GetVolunteerRegistrationHistoryAsync(Guid userId);
 
         Task<List<BloodRegistration>> GetDonationHistoryAsync(Guid userId);
+
+        Task<int> BloodRegistrationExpiredAsync();
     }
 }

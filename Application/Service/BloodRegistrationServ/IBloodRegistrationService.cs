@@ -11,5 +11,7 @@ namespace Application.Service.BloodRegistrationServ
         Task<BloodRegistration?> RejectBloodRegistration(int bloodRegisId);
         Task<ApiResponse<BloodRegistration>?> CancelOwnRegistration(int bloodRegisId);
         Task<PaginatedResultBloodRegis?> GetBloodRegistrationsByPaged(int eventId, int pageNumber, int pageSize);
+
+        Task<int> GetBloodRegistrationExpiredAsync();
     }
 }

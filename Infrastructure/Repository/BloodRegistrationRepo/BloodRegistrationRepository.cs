@@ -12,6 +12,21 @@ namespace Infrastructure.Repository.BloodRegistrationRepo
         {
         }
 
+        public async Task<int> BloodRegistrationExpiredAsync()
+        {
+            var today = DateOnly.FromDateTime(DateTime.Now);
+            var expiredRegistrations = _context.BloodRegistrations
+                .Where(br => br.Event.EventTime < today &&
+                br.IsApproved == null || (br.IsApproved == true && br.BloodProcedureId == null))
+                .ToListAsync();
+
+            foreach (var expiredRegistration in expiredRegistrations.Result)
+            {
+                expiredRegistration.IsApproved = false;
+            }
+            return await _context.SaveChangesAsync();
+        }
+
         public async Task<List<BloodRegistration>> GetBloodRegistrationHistoryAsync(Guid userId)
         {
             return await _context.BloodRegistrations
@@ -65,5 +80,7 @@ namespace Infrastructure.Repository.BloodRegistrationRepo
                                         .Where(br => br.Volunteer.MemberId == userId)
                                         .ToListAsync();
         }
+
+
     }
 }

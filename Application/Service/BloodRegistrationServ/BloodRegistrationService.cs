@@ -195,5 +195,10 @@ namespace Application.Service.BloodRegistrationServ
 
             return pagedBloodRegis;
         }
+
+        public async Task<int> GetBloodRegistrationExpiredAsync()
+        {
+            return await _repository.BloodRegistrationExpiredAsync();
+        }
     }
 }
