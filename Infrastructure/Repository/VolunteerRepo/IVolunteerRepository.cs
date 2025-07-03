@@ -6,6 +6,6 @@ namespace Infrastructure.Repository.VolunteerRepo
 {
     public interface IVolunteerRepository : IGenericRepository<Volunteer>
     {
-        Task<PaginatedResult<Volunteer>> GetPagedAsync(int pageNumber, int pageSize);
+        Task<List<Volunteer>> GetIncludePagedAsync(int pageNumber, int pageSize);
     }
 }

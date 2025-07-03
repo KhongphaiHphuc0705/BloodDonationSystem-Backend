@@ -2,6 +2,7 @@
 using Domain.Entities;
 using Infrastructure.Helper;
 using Infrastructure.Repository.Blood;
+using Infrastructure.Repository.Facilities;
 using Infrastructure.Repository.Users;
 using Infrastructure.Repository.VolunteerRepo;
 using Microsoft.AspNetCore.Http;
@@ -9,7 +10,8 @@ using Microsoft.AspNetCore.Http;
 namespace Application.Service.VolunteerServ
 {
     public class VolunteerService(IVolunteerRepository _repoVolun, IHttpContextAccessor _contextAccessor, 
-        IUserRepository _repoUser, IBloodTypeRepository _repoBloodType) : IVolunteerService
+        IUserRepository _repoUser, IBloodTypeRepository _repoBloodType,
+        IFacilityRepository _repoFacility) : IVolunteerService
     {
         public async Task<Volunteer?> RegisterVolunteerDonation(RegisterVolunteerDonation request)
         {
@@ -67,14 +69,22 @@ namespace Application.Service.VolunteerServ
 
         public async Task<PaginatedResult<VolunteersResponse>?> GetVolunteersByPaged(int pageNumber, int pageSize)
         {
-            var pagedVolunteerRaw = await _repoVolun.GetPagedAsync(pageNumber, pageSize);
+            // Hard code cho 1 cơ sở
+            var facility = await _repoFacility.GetByIdAsync(1);
+            if (facility == null)
+                throw new ArgumentNullException("Null");
+
+            var volunteersRaw = await _repoVolun.GetIncludePagedAsync(pageNumber, pageSize);
+
+            List<VolunteersResponse> volunteersRes = volunteers.Select(v => 
+                                                        )
 
             var pagedVolunteer = new PaginatedResult<VolunteersResponse>
             {
                 Items = new List<VolunteersResponse>(),
                 PageNumber = pageNumber,
                 PageSize = pageSize,
-                TotalItems = pagedVolunteerRaw.TotalItems
+                TotalItems = volunteersRaw.TotalItems
             };
 
             foreach (var volunteer in pagedVolunteerRaw.Items)
