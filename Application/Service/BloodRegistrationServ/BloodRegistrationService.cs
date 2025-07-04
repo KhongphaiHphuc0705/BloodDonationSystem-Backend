@@ -47,7 +47,7 @@ namespace Application.Service.BloodRegistrationServ
 
 
             // Kiểm tra member chỉ được đăng ký hiến máu 1 lần vào 1 event 
-            var checkedRegis = _repository.GetAllAsync().Result
+            var checkedRegis = _repository.GetByEventAsync(eventId).Result
                 .FirstOrDefault(br => br.MemberId == user.Id);
             if (checkedRegis != null)
             {
@@ -67,8 +67,6 @@ namespace Application.Service.BloodRegistrationServ
                 apiResponse.Message = "Last donation time not suitable.";
                 return apiResponse;  // Request xuống đều có LastDonation nên không cần xét trong hệ thống
             }
-
-
             await _repoUser.UpdateUserProfileAsync(user);
 
             var bloodRegis = new BloodRegistration

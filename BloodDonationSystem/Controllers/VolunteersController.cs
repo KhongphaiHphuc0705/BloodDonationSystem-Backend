@@ -65,5 +65,17 @@ namespace BloodDonationSystem.Controllers
                 Data = pagedVolunteer
             });
         }
+
+        [Authorize(Roles = "Staff")]
+        [HttpPut("find-donors")]
+        public async Task<IActionResult> AddDonationRegistrationWithVolunteer(int eventId, int id)
+        {
+            var apiResponse = await _service.AddDonationRegistrationWithVolunteer(eventId, id);
+
+            if (apiResponse?.IsSuccess == false)
+                return BadRequest(apiResponse);
+
+            return Ok(apiResponse);
+        }
     }
 }

@@ -16,18 +16,46 @@ namespace Infrastructure.Repository.VolunteerRepo
             _repoFacility = repoFacility;
         }
 
-        public async Task<List<Volunteer>> GetIncludePagedAsync(int pageNumber, int pageSize)
+        public async Task<PaginatedResult<Volunteer>> GetPagedAsync(int pageNumber, int pageSize)
         {
-            var volunteers = await _dbSet
+            // Hard code cho 1 cơ sở
+            var facility = await _repoFacility.GetByIdAsync(1);
+            if (facility == null)
+                throw new ArgumentNullException("Null");
+
+            decimal range = 0.1M;
+            var volunteersRaw = await _dbSet
                 .Include(v => v.Member)
-                //.Where(v => GeographyHelper.CalculateDistanceKm(facility.Latitude, facility.Longitude, v.Member.Latitude, v.Member.Longitude) <= 5)
-                //.OrderBy(v => GeographyHelper.CalculateDistanceKm(facility.Latitude, facility.Longitude, v.Member.Latitude, v.Member.Longitude))
-                //    .ThenBy(v => v.CreateAt)
-                .Skip(pageSize * (pageNumber - 1))
-                .Take(pageSize)
+                .Where(v => v.Member.Latitude >= facility.Latitude - range &&
+                            v.Member.Latitude <= facility.Latitude + range &&
+                            v.Member.Longitude >= facility.Longitude - range &&
+                            v.Member.Longitude <= facility.Longitude + range)
                 .ToListAsync();
 
-            return volunteers;
+            var volunteers = volunteersRaw
+                .Select(vr => new
+                {
+                    Volunteer = vr,
+                    Distance = GeographyHelper.CalculateDistanceKm(facility.Latitude, facility.Longitude, vr.Member.Latitude, vr.Member.Longitude)
+                })
+                .Where(vr => vr.Distance <= 5 && vr.Volunteer.IsExpired == false);
+
+            var volunteersPaged = volunteers
+                .OrderBy(vr => vr.Distance)
+                    .ThenBy(vr => vr.Volunteer.CreateAt)
+                .Skip(pageSize * (pageNumber - 1))
+                .Take(pageSize)
+                .ToList();
+                
+
+            var pagedResult = new PaginatedResult<Volunteer>
+            {
+                Items = volunteersPaged.Select(v => v.Volunteer).ToList(),
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalItems = volunteers.Count()
+            };
+            return pagedResult;
         }
     }
 }

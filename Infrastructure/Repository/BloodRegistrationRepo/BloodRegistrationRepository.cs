@@ -12,6 +12,13 @@ namespace Infrastructure.Repository.BloodRegistrationRepo
         {
         }
 
+        public async Task<IEnumerable<BloodRegistration>> GetByEventAsync(int eventId)
+        {
+            return await _dbSet
+                        .Where(br => br.EventId == eventId)
+                        .ToListAsync();           
+        }
+
         public async Task<PaginatedResult<BloodRegistration>> GetPagedAsync(int eventId, int pageNumber, int pageSize)
         {
              var bloodRegistrations = await _dbSet

@@ -1,4 +1,5 @@
-﻿using Application.DTO.VolunteerDTO;
+﻿using Application.DTO;
+using Application.DTO.VolunteerDTO;
 using Domain.Entities;
 using Infrastructure.Helper;
 
@@ -8,6 +9,7 @@ namespace Application.Service.VolunteerServ
     {
         Task<Volunteer?> RegisterVolunteerDonation(RegisterVolunteerDonation request);
         Task<Volunteer?> UpdateVolunteerDonation(int id, UpdateVolunteerDonation request);
-        Task<PaginatedResult<VolunteersResponse>?> GetVolunteersByPaged(int pageNumber, int pageSize); 
+        Task<PaginatedResult<VolunteersResponse>?> GetVolunteersByPaged(int pageNumber, int pageSize);
+        Task<ApiResponse<Volunteer>?> AddDonationRegistrationWithVolunteer(int eventId, int id);
     }
 }
