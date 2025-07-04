@@ -1,5 +1,7 @@
 ﻿using Application.DTO;
+using Application.DTO.BloodHistoryDTO;
 using Application.DTO.VolunteerDTO;
+using Application.Service.BloodHistoryServ;
 using Application.Service.VolunteerServ;
 using Infrastructure.Helper;
 using Microsoft.AspNetCore.Authorization;
@@ -11,7 +13,7 @@ namespace BloodDonationSystem.Controllers
     [EnableCors("LocalPolicy")]
     [Route("api/[controller]")]
     [ApiController]
-    public class VolunteersController(IVolunteerService _service) : ControllerBase
+    public class VolunteersController(IVolunteerService _service, IBloodHistoryService _bloodHistory) : ControllerBase
     {
         [Authorize(Roles = "Member")]
         [HttpPost]
@@ -76,6 +78,26 @@ namespace BloodDonationSystem.Controllers
                 return BadRequest(apiResponse);
 
             return Ok(apiResponse);
+        }
+
+        [Authorize]
+        [HttpPut("{id}/date")]
+        public async Task<IActionResult> UpdateAvailableDateForVolunteer(int id, [FromBody]UpdateAvailableDateDTO request)
+        {
+            var update = await _bloodHistory.UpdateAvailableDateVolunteerAsync(id, request);
+            if (!update)
+            {
+                return BadRequest(new
+                {
+                    IsSuccess = false,
+                    Message = "Failed to update"
+                });
+            }
+            return Ok(new
+            {
+                IsSuccess = true,
+                Message = "Update successfully"
+            });
         }
     }
 }

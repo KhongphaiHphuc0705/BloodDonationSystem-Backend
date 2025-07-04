@@ -16,11 +16,12 @@ namespace Application.Service.BloodInventoryServ
         {
             ApiResponse<BloodInventory> apiResponse = new();
 
+            // Kiểm tra blood unit có sẵn sàng hay không
             var bloodUnit = await _repo.GetByIdAsync(id);
             if (bloodUnit == null || bloodUnit.IsAvailable == false)
             {
                 apiResponse.IsSuccess = false;
-                apiResponse.Message = "Blood unit not found or not available";
+                apiResponse.Message = "Blood unit not found or not available.";
                 return apiResponse;
             }
 

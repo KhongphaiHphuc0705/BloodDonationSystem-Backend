@@ -8,5 +8,10 @@ namespace Infrastructure.Repository.BloodRegistrationRepo
     {
         Task<PaginatedResult<BloodRegistration>> GetPagedAsync(int eventId, int pageNumber, int pageSize);
         Task<IEnumerable<BloodRegistration>> GetByEventAsync(int eventId);
+
+        Task<List<BloodRegistration>> GetBloodRegistrationHistoryAsync(Guid userId);
+        Task<List<BloodRegistration>> GetVolunteerRegistrationHistoryAsync(Guid userId);
+
+        Task<List<BloodRegistration>> GetDonationHistoryAsync(Guid userId);
     }
 }
