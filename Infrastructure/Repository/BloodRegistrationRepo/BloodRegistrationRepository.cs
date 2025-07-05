@@ -52,13 +52,13 @@ namespace Infrastructure.Repository.BloodRegistrationRepo
 
         public async Task<PaginatedResult<BloodRegistration>> GetPagedAsync(int eventId, int pageNumber, int pageSize)
         {
-             var bloodRegistrations = await _dbSet
-                                    .Include(br => br.Event)
-                                    .Where(br => br.EventId == eventId)
-                                    .OrderByDescending(e => e.CreateAt)
-                                    .Skip(pageSize * (pageNumber - 1))
-                                    .Take(pageSize)
-                                    .ToListAsync();
+            var bloodRegistrations = await _dbSet
+                                   .Include(br => br.Event)
+                                   .Where(br => br.EventId == eventId)
+                                   .OrderByDescending(e => e.CreateAt)
+                                   .Skip(pageSize * (pageNumber - 1))
+                                   .Take(pageSize)
+                                   .ToListAsync();
 
             var pagedResult = new PaginatedResult<BloodRegistration>
             {
@@ -81,6 +81,32 @@ namespace Infrastructure.Repository.BloodRegistrationRepo
                                         .ToListAsync();
         }
 
+        public async Task<List<BloodRegistration>> SearchBloodRegistration(int pageNumber, int pageSize, string keyword)
+        {
+            IQueryable<BloodRegistration> query = _context.BloodRegistrations
+                                                  .Include(br => br.Member)
+                                                  .ThenInclude(br => br.BloodType)
+                                                  .Include(br => br.Event);
 
+            if (IsPhoneNumber(keyword))
+            {
+                query = query.Where(br => br.Member.Phone.Contains(keyword));
+            }
+            else
+            {
+                query = query.Where(br => br.Member.FirstName.Contains(keyword) || br.Member.LastName.Contains(keyword));
+            }
+
+            return await query
+                .OrderByDescending(br => br.CreateAt)
+                .Skip(pageSize * (pageNumber - 1))
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
+        private bool IsPhoneNumber(string keyword)
+        {
+            return keyword.All(char.IsDigit);
+        }
     }
 }

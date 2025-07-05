@@ -161,7 +161,7 @@ namespace BloodDonationSystem.Controllers
             });
         }
 
-        [HttpGet("api/events/seach")]
+        [HttpGet("api/events/search")]
         public async Task<IActionResult> SearchEventFromDayToDay([FromQuery]int pageNumber = 1, [FromQuery]int pageSize = 10,[FromQuery]DateOnly? startDay = null,[FromQuery]DateOnly? endDay = null)
         {
             var events = await _eventService.SearchEventByDayAsync(pageNumber, pageSize, startDay, endDay);

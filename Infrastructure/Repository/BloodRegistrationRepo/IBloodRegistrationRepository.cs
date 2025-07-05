@@ -13,6 +13,8 @@ namespace Infrastructure.Repository.BloodRegistrationRepo
 
         Task<List<BloodRegistration>> GetDonationHistoryAsync(Guid userId);
 
+        Task<List<BloodRegistration>> SearchBloodRegistration(int pageNumber, int pageSize, string keyword);
+
         Task<int> BloodRegistrationExpiredAsync();
     }
 }
