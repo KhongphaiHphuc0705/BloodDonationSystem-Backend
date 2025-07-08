@@ -178,6 +178,8 @@ namespace Infrastructure.Repository.Events
                 .Include(e => e.BloodType)
                 .Include(e => e.BloodRegistrations)
                 .Where(e => e.EventTime >= startDay && e.EventTime <= endDay && e.IsExpired == false)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
         }
 
