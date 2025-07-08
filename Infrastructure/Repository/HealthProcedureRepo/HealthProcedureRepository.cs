@@ -43,14 +43,15 @@ namespace Infrastructure.Repository.HealthProcedureRepo
                 .FirstOrDefaultAsync(hp => hp.Id == id);
         }
 
-        public async Task<List<HealthProcedure>> SearchHealthProceduresByNameOrPhoneAsync(int pageNumber, int pageSize, string keyword)
+        public async Task<List<HealthProcedure>> SearchHealthProceduresByNameOrPhoneAsync(int pageNumber, int pageSize, string keyword, int? eventId = null)
         {
             IQueryable<HealthProcedure> query = _context.HealthProcedures
-                .Include(hp => hp.BloodRegistration)
-                    .ThenInclude(br => br.Member)
-                    .ThenInclude(m => m.BloodType)
-                .Include(hp => hp.BloodRegistration)
-                    .ThenInclude(br => br.Event);
+                                            .Include(hp => hp.BloodRegistration)
+                                                .ThenInclude(br => br.Member)
+                                                .ThenInclude(m => m.BloodType)
+                                            .Include(hp => hp.BloodRegistration)
+                                                .ThenInclude(br => br.Event)
+                                            .Where(h => h.BloodRegistration.IsApproved == true && h.BloodRegistration.BloodProcedureId == null);
 
             if (IsPhone(keyword))
             {
@@ -60,6 +61,11 @@ namespace Infrastructure.Repository.HealthProcedureRepo
             {
                 query = query.Where(hp => hp.BloodRegistration.Member.FirstName.Contains(keyword) 
                 || hp.BloodRegistration.Member.LastName.Contains(keyword));
+            }
+
+            if(eventId != null)
+            {
+                query = query.Where(hp => hp.BloodRegistration.EventId == eventId);
             }
 
             return await query

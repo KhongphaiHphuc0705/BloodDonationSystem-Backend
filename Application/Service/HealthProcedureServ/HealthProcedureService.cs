@@ -136,26 +136,27 @@ namespace Application.Service.HealthProcedureServ
             return healthProcedureAdded;
         }
 
-        public async Task<PaginatedResult<HealthProceduresResponse>?> SearchHealthProceduresByPhoneOrNameAsync(int pageNumber, int pageSize, string keyword)
+        public async Task<PaginatedResult<SearchHealthProcedureDTO>?> SearchHealthProceduresByPhoneOrNameAsync(int pageNumber, int pageSize, string keyword, int? eventId = null)
         {
-            var healthProcedures = await _repo.SearchHealthProceduresByNameOrPhoneAsync(pageNumber, pageSize, keyword);
+            var healthProcedures = await _repo.SearchHealthProceduresByNameOrPhoneAsync(pageNumber, pageSize, keyword, eventId);
 
             if (healthProcedures == null || !healthProcedures.Any())
             {
                 return null;
             }
 
-            var dto = healthProcedures.Select(hp => new HealthProceduresResponse
+            var dto = healthProcedures.Select(hp => new SearchHealthProcedureDTO
             {
                 Id = hp.Id,
                 IsHealth = hp.IsHealth,
                 PerformedAt = hp.PerformedAt,
                 FullName = hp.BloodRegistration?.Member?.LastName + " " + hp.BloodRegistration?.Member?.FirstName,
                 BloodTypeName = hp.BloodRegistration?.Member?.BloodType?.Type,
-                BloodRegisId = hp.BloodRegistration.Id
+                BloodRegisId = hp.BloodRegistration.Id,
+                EventTime = hp.BloodRegistration?.Event?.EventTime
             }).ToList();
 
-            return new PaginatedResult<HealthProceduresResponse>
+            return new PaginatedResult<SearchHealthProcedureDTO>
             {
                 Items = dto,
                 PageNumber = pageNumber,
