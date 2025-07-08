@@ -101,16 +101,16 @@ namespace Application.Service.BloodProcedureServ
             return apiResponse;
         }
 
-        public async Task<PaginatedResult<BloodCollectionResponse>?> SearchBloodCollectionsByPhoneOrName(int pageNumber, int pageSize, string keyword)
+        public async Task<PaginatedResult<SearchBloodProcedureDTO>?> SearchBloodCollectionsByPhoneOrName(int pageNumber, int pageSize, string keyword, int? eventId = null)
         {
-            var bloodCollections = await _repo.SearchBloodCollectionsByPhoneOrNameAsync(pageNumber, pageSize, keyword);
+            var bloodCollections = await _repo.SearchBloodCollectionsByPhoneOrNameAsync(pageNumber, pageSize, keyword, eventId);
 
             if (bloodCollections == null || !bloodCollections.Any())
             {
                 return null;
             }
 
-            var dto = bloodCollections.Select(bc => new BloodCollectionResponse
+            var dto = bloodCollections.Select(bc => new SearchBloodProcedureDTO
             {
                 Id = bc.Id,
                 DonationRegisId = bc.BloodRegistration.Id,
@@ -118,10 +118,11 @@ namespace Application.Service.BloodProcedureServ
                 FullName = bc.BloodRegistration.Member.LastName + " " + bc.BloodRegistration.Member.FirstName,
                 BloodTypeName = bc.BloodRegistration.Member.BloodType?.Type,
                 PerformedAt = bc.PerformedAt,
-                IsQualified = bc.IsQualified
+                IsQualified = bc.IsQualified,
+                EventTime = bc.BloodRegistration.Event?.EventTime
             }).ToList();
 
-            return new PaginatedResult<BloodCollectionResponse>
+            return new PaginatedResult<SearchBloodProcedureDTO>
             {
                 Items = dto,
                 PageNumber = pageNumber,

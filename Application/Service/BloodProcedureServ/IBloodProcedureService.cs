@@ -11,6 +11,6 @@ namespace Application.Service.BloodProcedureServ
         Task<ApiResponse<BloodProcedure>?> UpdateBloodQualificationAsync(int regisId, RecordBloodQualification request);
         Task<PaginatedResultBloodProce?> GetBloodCollectionsByPaged(int eventId, int pageNumber, int pageSize);
 
-        Task<PaginatedResult<BloodCollectionResponse>?> SearchBloodCollectionsByPhoneOrName(int pageNumber, int pageSize, string keyword);
+        Task<PaginatedResult<SearchBloodProcedureDTO>?> SearchBloodCollectionsByPhoneOrName(int pageNumber, int pageSize, string keyword, int? eventId = null);
     }
 }
