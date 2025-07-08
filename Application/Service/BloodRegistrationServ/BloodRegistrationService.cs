@@ -35,6 +35,15 @@ namespace Application.Service.BloodRegistrationServ
                 return apiResponse;
             }
 
+            // Không được đăng ký khi đạt tới MaxOfDonor
+            var bloodRegisList = await _repository.GetByEventAsync(eventId);
+            if (bloodRegisList.Count() >= existingEvent.MaxOfDonor)
+            {
+                apiResponse.IsSuccess = false;
+                apiResponse.Message = "Event reached max of donor";
+                return apiResponse;
+            }
+
             // Lấy thông tin user đang thao tác form
             var userId = _contextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
             if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out Guid creatorId))
@@ -55,10 +64,14 @@ namespace Application.Service.BloodRegistrationServ
                 apiResponse.Message = "Already registered in this event.";
                 return apiResponse;
             }
-                
+
             // Kiểm tra người dùng đã từng hiến máu ở hệ thống lần nào chưa
+            bool changedLastDonation = false;
             if (user.LastDonation == null)
+            {
                 user.LastDonation = request.LastDonation;
+                changedLastDonation = true;
+            }
 
             // Kiểm tra xem lần cuối hiến máu có phù hợp
             if (user.LastDonation >= DateTime.Now.AddDays(-90))
@@ -67,7 +80,8 @@ namespace Application.Service.BloodRegistrationServ
                 apiResponse.Message = "Last donation time not suitable.";
                 return apiResponse;  // Request xuống đều có LastDonation nên không cần xét trong hệ thống
             }
-            await _repoUser.UpdateUserProfileAsync(user);
+            if (changedLastDonation == true)
+                await _repoUser.UpdateUserProfileAsync(user);
 
             var bloodRegis = new BloodRegistration
             {

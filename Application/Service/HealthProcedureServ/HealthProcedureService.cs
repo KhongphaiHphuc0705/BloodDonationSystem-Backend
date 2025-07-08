@@ -86,6 +86,7 @@ namespace Application.Service.HealthProcedureServ
                     IsHealth = health.IsHealth,
                     PerformedAt = health.PerformedAt,
                     FullName = health.BloodRegistration?.Member?.LastName + " " + health.BloodRegistration?.Member?.FirstName,
+                    Phone = health.BloodRegistration?.Member?.Phone,
                     BloodTypeName = health.BloodRegistration?.Member?.BloodType?.Type,
                     BloodRegisId = health.BloodRegistration.Id
                 };
@@ -96,8 +97,9 @@ namespace Application.Service.HealthProcedureServ
 
         public async Task<HealthProcedure?> RecordHealthProcedureAsync(int id, HealthProcedureRequest request)
         {
+            // Nếu đơn đăng ký Not Found hoặc đã khám thì không được record
             var bloodRegistration = await _repoRegis.GetByIdAsync(id);
-            if (bloodRegistration == null || bloodRegistration.IsApproved == false)
+            if (bloodRegistration == null || bloodRegistration.IsApproved != null)
                 return null;
 
             var userId = _contextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;

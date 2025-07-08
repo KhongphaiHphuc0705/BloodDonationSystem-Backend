@@ -19,19 +19,11 @@ namespace BloodDonationSystem.Controllers
         [HttpPost]
         public async Task<IActionResult> RegisterVolunteerDonation([FromBody] RegisterVolunteerDonation request)
         {
-            var volunteerRegistration = await _service.RegisterVolunteerDonation(request);
-            if (volunteerRegistration == null)
-                return BadRequest(new ApiResponse<RegisterVolunteerDonation>
-                {
-                    IsSuccess = false,
-                    Message = "Register volunteer donation unsuccessfully"
-                });
+            var apiResponse = await _service.RegisterVolunteerDonation(request);
+            if (apiResponse?.IsSuccess == false)
+                return BadRequest(apiResponse);
 
-            return Ok(new ApiResponse<RegisterVolunteerDonation>()
-            {
-                IsSuccess = true,
-                Message = "Register volunteer donation successfully"
-            });
+            return Ok(apiResponse);
         }
 
         [Authorize(Roles = "Member")]

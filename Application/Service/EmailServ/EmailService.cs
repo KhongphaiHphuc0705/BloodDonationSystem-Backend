@@ -33,6 +33,10 @@ namespace Application.Service.EmailServ
         {
             var (member, eventObj, facility) = await GetNecessariesForSendEmail(bloodRegistration);
 
+            // Nếu member chưa có gmail thì khỏi gửi
+            if (member?.Gmail == null)
+                return;
+
             var message = new MimeMessage();
             message.From.Add(new MailboxAddress("Trung tâm Hiến Máu Nhân Đạo Ép Pê Tê", _settings.From));
             message.To.Add(MailboxAddress.Parse(member?.Gmail));
@@ -90,6 +94,10 @@ namespace Application.Service.EmailServ
         {
             var (member, eventObj, facility) = await GetNecessariesForSendEmail(bloodRegistration);
             var bloodType = await _repoBloodType.GetBloodTypeByIdAsync(eventObj?.BloodTypeId);
+
+            // Nếu member chưa có gmail thì khỏi gửi
+            if (member?.Gmail == null)
+                return;
 
             var message = new MimeMessage();
             message.From.Add(new MailboxAddress("Trung tâm Hiến Máu Nhân Đạo Ép Pê Tê", _settings.From));

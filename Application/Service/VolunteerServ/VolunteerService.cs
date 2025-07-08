@@ -13,26 +13,48 @@ using Microsoft.AspNetCore.Http;
 
 namespace Application.Service.VolunteerServ
 {
-    public class VolunteerService(IVolunteerRepository _repoVolun, IHttpContextAccessor _contextAccessor, 
+    public class VolunteerService(IVolunteerRepository _repoVolun, IHttpContextAccessor _contextAccessor,
         IUserRepository _repoUser, IBloodTypeRepository _repoBloodType,
         IEventRepository _repoEvent, IBloodRegistrationRepository _repoRegis,
         IEmailService _repoMail, IFacilityRepository _repoFacility) : IVolunteerService
     {
-        public async Task<Volunteer?> RegisterVolunteerDonation(RegisterVolunteerDonation request)
+        public async Task<ApiResponse<Volunteer>?> RegisterVolunteerDonation(RegisterVolunteerDonation request)
         {
+            ApiResponse<Volunteer> apiResponse = new();
+
             var userId = _contextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
             if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out Guid creatorId))
                 throw new UnauthorizedAccessException("User not found or invalid");
-
-            if (request.LastDonation >= DateTime.Now.AddDays(-90))
-                return null;
-
             var user = await _repoUser.GetUserByIdAsync(creatorId);
-            if (user != null && user.LastDonation == null)
+            if (user == null)
+                throw new UnauthorizedAccessException("User not found or invalid");
+
+            // Nếu đã đăng ký tình nguyện thì không được đăng ký nữa
+            var checkedVolunteer = await _repoVolun.GetVolunteerByMemberIdAsync(creatorId);
+            if (checkedVolunteer != null)
+            {
+                apiResponse.IsSuccess = false;
+                apiResponse.Message = "Having a registered volunteer.";
+                return apiResponse;
+            }
+
+            // Kiểm tra đã hiến máu ở hệ thống lần nào chưa
+            bool changedLastDonation = false;
+            if (user.LastDonation == null)
             {
                 user.LastDonation = request.LastDonation;
-                await _repoUser.UpdateUserProfileAsync(user);
+                changedLastDonation = true;
             }
+
+            // Kiểm tra lần cuối hiến máu có phù hợp
+            if (user.LastDonation >= DateTime.Now.AddDays(-90))
+            {
+                apiResponse.IsSuccess = false;
+                apiResponse.Message = "Last donation not suitable.";
+                return apiResponse;
+            }
+            if (changedLastDonation == true)
+                await _repoUser.UpdateUserProfileAsync(user);
 
             var volunteer = new Volunteer
             {
@@ -42,7 +64,11 @@ namespace Application.Service.VolunteerServ
                 IsExpired = false,
                 MemberId = creatorId
             };
-            return await _repoVolun.AddAsync(volunteer);
+            await _repoVolun.AddAsync(volunteer);
+
+            apiResponse.IsSuccess = true;
+            apiResponse.Message = "Register volunteer successfully";
+            return apiResponse;
         }
 
         public async Task<Volunteer?> UpdateVolunteerDonation(int id, UpdateVolunteerDonation request)
@@ -99,7 +125,7 @@ namespace Application.Service.VolunteerServ
                 {
                     Id = volunteer.Id,
                     BloodTypeName = bloodType?.Type,
-                    Distance = Math.Round((decimal) GeographyHelper.CalculateDistanceKm(facility.Latitude, facility.Longitude, member.Latitude, member.Longitude), 1),
+                    Distance = Math.Round((decimal)GeographyHelper.CalculateDistanceKm(facility.Latitude, facility.Longitude, member.Latitude, member.Longitude), 1),
                     FullName = member.LastName + " " + member.FirstName,
                     Phone = member?.Phone,
                     Gmail = member?.Gmail
@@ -115,8 +141,9 @@ namespace Application.Service.VolunteerServ
 
             // Kiểm tra xem event tồn tại hay đã hết hạn
             var existingEvent = await _repoEvent.GetEventByIdAsync(eventId);
-            if (existingEvent == null || existingEvent.IsExpired == true 
-                || existingEvent.IsUrgent == false)
+            if (existingEvent == null || 
+                existingEvent.IsExpired == true || 
+                existingEvent.IsUrgent == false)
             {
                 apiResponse.IsSuccess = false;
                 apiResponse.Message = "Event not found or be expired or not urgent";
@@ -128,7 +155,7 @@ namespace Application.Service.VolunteerServ
             if (existingEvent.MaxOfDonor <= bloodRegistrations.Count())
             {
                 apiResponse.IsSuccess = false;
-                apiResponse.Message = "Event reached max donor";
+                apiResponse.Message = "Event reached max of donor";
                 return apiResponse;
             }
 
@@ -138,6 +165,15 @@ namespace Application.Service.VolunteerServ
             {
                 apiResponse.IsSuccess = false;
                 apiResponse.Message = "Volunteer not existed or be expired";
+                return apiResponse;
+            }
+
+            // Kiểm tra khi add thì StartDate & EndDate đã phù hợp hay chưa
+            if (DateOnly.FromDateTime(existingVolunteer.StartVolunteerDate) > existingEvent.EventTime ||
+                DateOnly.FromDateTime(existingVolunteer.EndVolunteerDate) < existingEvent.EventTime)
+            {
+                apiResponse.IsSuccess = false;
+                apiResponse.Message = "Volunteer not ready to donate.";
                 return apiResponse;
             }
 
