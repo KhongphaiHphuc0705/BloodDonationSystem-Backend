@@ -136,7 +136,7 @@ namespace Application.Service.HealthProcedureServ
             return healthProcedureAdded;
         }
 
-        public async Task<PaginatedResult<SearchHealthProcedureDTO>?> SearchHealthProceduresByPhoneOrNameAsync(int pageNumber, int pageSize, string keyword, int? eventId = null)
+        public async Task<PaginatedResultWithEventTime<SearchHealthProcedureDTO>?> SearchHealthProceduresByPhoneOrNameAsync(int pageNumber, int pageSize, string keyword, int? eventId = null)
         {
             var healthProcedures = await _repo.SearchHealthProceduresByNameOrPhoneAsync(pageNumber, pageSize, keyword, eventId);
 
@@ -145,25 +145,33 @@ namespace Application.Service.HealthProcedureServ
                 return null;
             }
 
+            var eventTime = healthProcedures.FirstOrDefault()?.BloodRegistration?.Event?.EventTime;
+
             var dto = healthProcedures.Select(hp => new SearchHealthProcedureDTO
             {
                 Id = hp.Id,
                 IsHealth = hp.IsHealth,
                 PerformedAt = hp.PerformedAt,
+                Phone = hp.BloodRegistration.Member.Phone,
                 FullName = hp.BloodRegistration?.Member?.LastName + " " + hp.BloodRegistration?.Member?.FirstName,
                 BloodTypeName = hp.BloodRegistration?.Member?.BloodType?.Type,
-                BloodRegisId = hp.BloodRegistration.Id,
-                EventTime = hp.BloodRegistration?.Event?.EventTime
+                BloodRegisId = hp.BloodRegistration.Id
             }).ToList();
 
-            return new PaginatedResult<SearchHealthProcedureDTO>
+            var totalItems = await _repo.CountAsync(hp =>
+                                   (hp.BloodRegistration.Member.FirstName.Contains(keyword)
+                                   || hp.BloodRegistration.Member.LastName.Contains(keyword)
+                                   || hp.BloodRegistration.Member.Phone.Contains(keyword))
+                                   && hp.BloodRegistration.IsApproved == true
+                                   && hp.BloodRegistration.BloodProcedureId == null);
+
+            return new PaginatedResultWithEventTime<SearchHealthProcedureDTO>
             {
-                Items = dto,
                 PageNumber = pageNumber,
                 PageSize = pageSize,
-                TotalItems = await _repo.CountAsync(hp => hp.BloodRegistration.Member.FirstName.Contains(keyword) 
-                    || hp.BloodRegistration.Member.LastName.Contains(keyword) 
-                    || hp.BloodRegistration.Member.Phone.Contains(keyword))
+                TotalItems = totalItems,
+                EventTime = eventTime,
+                Items = dto
             };
         }
     }

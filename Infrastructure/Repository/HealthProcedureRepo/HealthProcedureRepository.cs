@@ -69,7 +69,7 @@ namespace Infrastructure.Repository.HealthProcedureRepo
             }
 
             return await query
-                .OrderByDescending(hp => hp.PerformedAt)
+                .OrderBy(hp => hp.PerformedAt)
                 .Skip(pageSize * (pageNumber - 1))
                 .Take(pageSize)
                 .ToListAsync();

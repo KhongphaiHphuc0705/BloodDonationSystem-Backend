@@ -14,6 +14,6 @@ namespace Application.DTO.HealthProcedureDTO
         public string FullName { get; set; }
         public string? BloodTypeName { get; set; }
         public int BloodRegisId { get; set; }
-        public DateOnly? EventTime { get; set; }
+        public string Phone { get; set; }
     }
 }
