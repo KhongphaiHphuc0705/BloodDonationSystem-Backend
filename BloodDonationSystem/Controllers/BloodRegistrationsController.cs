@@ -124,7 +124,7 @@ namespace BloodDonationSystem.Controllers
         public async Task<IActionResult> SearchBloodRegistrationsByPhoneOrName([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string? keyword = null, [FromQuery] int? eventId = null)
         {
             var bloodRegistrations = await _service.SearchBloodRegistrationsByPhoneOrName(pageNumber, pageSize, keyword, eventId);
-            if (bloodRegistrations == null)
+            if (bloodRegistrations == null || !bloodRegistrations.Items.Any())
             {
                 return NotFound(new
                 {
