@@ -141,7 +141,7 @@ namespace Application.Service.VolunteerServ
         {
             ApiResponse<Volunteer> apiResponse = new();
 
-            // Kiểm tra xem event tồn tại hay đã hết hạn
+            // Kiểm tra xem event tồn tại, hay đã hết hạn, hay có phải là urgent hay không
             var existingEvent = await _repoEvent.GetEventByIdAsync(eventId);
             if (existingEvent == null || 
                 existingEvent.IsExpired == true || 

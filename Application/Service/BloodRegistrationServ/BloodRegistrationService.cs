@@ -200,8 +200,8 @@ namespace Application.Service.BloodRegistrationServ
                     Id = bloodRegis.Id,
                     MemberName = member.LastName + " " + member.FirstName,
                     Phone = member.Phone,
-                    Type = bloodType?.Type,
-                    EventTime = eventExists.EventTime
+                    Dob = member.Dob,
+                    Type = bloodType?.Type
                 });
             }
 

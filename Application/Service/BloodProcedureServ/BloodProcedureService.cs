@@ -156,6 +156,10 @@ namespace Application.Service.BloodProcedureServ
 
             // Cập nhật thông tin kiểm tra chất lượng máu
             bloodProcedure.IsQualified = request.IsQualified;
+            bloodProcedure.HIV = request.HIV;
+            bloodProcedure.HCV = request.HCV;
+            bloodProcedure.Syphilis = request.Syphilis;
+            bloodProcedure.Hematocrit = request.Hematocrit;
             bloodProcedure.BloodTypeId = request.BloodTypeId;
             bloodProcedure.BloodComponent = request.BloodComponent;
             bloodProcedure.PerformedAt = DateTime.Now;
