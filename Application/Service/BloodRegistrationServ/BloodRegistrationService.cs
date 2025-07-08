@@ -202,7 +202,7 @@ namespace Application.Service.BloodRegistrationServ
             return await _repository.BloodRegistrationExpiredAsync();
         }
 
-        public async Task<PaginatedResult<BloodRegistrationResponse>?> SearchBloodRegistrationsByPhoneOrName(int pageNumber, int pageSize, string keyword, int? eventId = null)
+        public async Task<PaginatedResultWithEventTime<BloodRegistrationResponse>?> SearchBloodRegistrationsByPhoneOrName(int pageNumber, int pageSize, string keyword, int? eventId = null)
         {
             if(string.IsNullOrEmpty(keyword))
             {
@@ -210,6 +210,9 @@ namespace Application.Service.BloodRegistrationServ
             }
 
             var pagedBloodRegisRaw = await _repository.SearchBloodRegistration(pageNumber, pageSize, keyword, eventId);
+
+            var eventTime = pagedBloodRegisRaw.FirstOrDefault()?.Event?.EventTime;
+
             var dto = pagedBloodRegisRaw.Select(br => new BloodRegistrationResponse
             {
                 Id = br.Id,
@@ -219,12 +222,19 @@ namespace Application.Service.BloodRegistrationServ
                 EventTime = br.Event.EventTime
             }).ToList();
 
-            return new PaginatedResult<BloodRegistrationResponse>
+            var totalItems = await _repository.CountAsync(br =>
+                                               (br.Member.FirstName.Contains(keyword)
+                                               || br.Member.LastName.Contains(keyword)
+                                               || br.Member.Phone.Contains(keyword))
+                                               && br.IsApproved == null);
+
+            return new PaginatedResultWithEventTime<BloodRegistrationResponse>
             {
-                Items = dto,
-                PageNumber = 1, // Assuming this is a search, so we can set page number to 1
-                PageSize = dto.Count, // All results are returned in one page
-                TotalItems = dto.Count
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalItems = totalItems,
+                EventTime = eventTime,
+                Items = dto
             };
         }
     }
