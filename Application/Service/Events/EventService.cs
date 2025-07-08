@@ -145,10 +145,11 @@ namespace Application.Service.Events
             return eventItem;
         }
 
-        public async Task<PaginatedResult<ListWaiting>> GetEventListDoBloodProcedure(int pageNumber, int pageSize)
+        public async Task<PaginatedResultWithEventTime<ListWaiting>> GetEventListDoBloodProcedure(int pageNumber, int pageSize)
         {
             var events = await _eventRepository.GetEventListDoBloodProcedure(pageNumber, pageSize);
             var totalItems = await _eventRepository.CountEventListDoBloodProcedure();
+            var eventTime = events.FirstOrDefault()?.EventTime;
 
             var dto = events.Select(e => new ListWaiting
             {
@@ -158,19 +159,21 @@ namespace Application.Service.Events
             }).Where(e => e.Total > 0)
               .ToList();
 
-            return new PaginatedResult<ListWaiting>
+            return new PaginatedResultWithEventTime<ListWaiting>
             {
                 TotalItems = totalItems,
-                Items = dto,
                 PageNumber = pageNumber,
-                PageSize = pageSize
+                PageSize = pageSize,
+                EventTime = eventTime,
+                Items = dto,
             };
         }
 
-        public async Task<PaginatedResult<ListWaiting>> GetPassedHealthProcedureAsync(int pageNumber, int pageSize)
+        public async Task<PaginatedResultWithEventTime<ListWaiting>> GetPassedHealthProcedureAsync(int pageNumber, int pageSize)
         {
             var events = await _eventRepository.GetPassedHealthProcedureAsync(pageNumber, pageSize);
             var totalItems = await _eventRepository.CountEventPassedHealthProcedureAsync();
+            var eventTime = events.FirstOrDefault()?.EventTime;
 
             var dto = events.Select(e => new ListWaiting
             {
@@ -180,12 +183,13 @@ namespace Application.Service.Events
             }).Where(e => e.Total > 0)
               .ToList();
 
-            return new PaginatedResult<ListWaiting>
+            return new PaginatedResultWithEventTime<ListWaiting>
             {
                 TotalItems = totalItems,
-                Items = dto,
                 PageNumber = pageNumber,
-                PageSize = pageSize
+                PageSize = pageSize,
+                EventTime = eventTime,
+                Items = dto,
             };
         }
 
