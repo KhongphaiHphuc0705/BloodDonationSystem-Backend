@@ -202,14 +202,14 @@ namespace Application.Service.BloodRegistrationServ
             return await _repository.BloodRegistrationExpiredAsync();
         }
 
-        public async Task<PaginatedResult<BloodRegistrationResponse>?> SearchBloodRegistrationsByPhoneOrName(int pageNumber, int pageSize, string keyword)
+        public async Task<PaginatedResult<BloodRegistrationResponse>?> SearchBloodRegistrationsByPhoneOrName(int pageNumber, int pageSize, string keyword, int? eventId = null)
         {
             if(string.IsNullOrEmpty(keyword))
             {
                 return null; // Return null if keyword is empty or null
             }
 
-            var pagedBloodRegisRaw = await _repository.SearchBloodRegistration(pageNumber, pageSize, keyword);
+            var pagedBloodRegisRaw = await _repository.SearchBloodRegistration(pageNumber, pageSize, keyword, eventId);
             var dto = pagedBloodRegisRaw.Select(br => new BloodRegistrationResponse
             {
                 Id = br.Id,

@@ -13,7 +13,7 @@ namespace Application.Service.BloodRegistrationServ
         Task<ApiResponse<BloodRegistration>?> CancelOwnRegistration(int bloodRegisId);
         Task<PaginatedResultBloodRegis?> GetBloodRegistrationsByPaged(int eventId, int pageNumber, int pageSize);
 
-        Task<PaginatedResult<BloodRegistrationResponse>?> SearchBloodRegistrationsByPhoneOrName(int pageNumber, int pageSize, string keyword);
+        Task<PaginatedResult<BloodRegistrationResponse>?> SearchBloodRegistrationsByPhoneOrName(int pageNumber, int pageSize, string keyword, int? eventId = null);
 
         Task<int> GetBloodRegistrationExpiredAsync();
     }

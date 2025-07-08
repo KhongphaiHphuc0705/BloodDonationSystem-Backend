@@ -81,7 +81,7 @@ namespace Infrastructure.Repository.BloodRegistrationRepo
                                         .ToListAsync();
         }
 
-        public async Task<List<BloodRegistration>> SearchBloodRegistration(int pageNumber, int pageSize, string keyword)
+        public async Task<List<BloodRegistration>> SearchBloodRegistration(int pageNumber, int pageSize, string keyword, int? eventId = null)
         {
             IQueryable<BloodRegistration> query = _context.BloodRegistrations
                                                   .Include(br => br.Member)
@@ -95,6 +95,11 @@ namespace Infrastructure.Repository.BloodRegistrationRepo
             else
             {
                 query = query.Where(br => br.Member.FirstName.Contains(keyword) || br.Member.LastName.Contains(keyword));
+            }
+
+            if(eventId != null)
+            {
+                query = query.Where(br => br.EventId == eventId);
             }
 
             return await query
