@@ -86,7 +86,8 @@ namespace Infrastructure.Repository.BloodRegistrationRepo
             IQueryable<BloodRegistration> query = _context.BloodRegistrations
                                                   .Include(br => br.Member)
                                                   .ThenInclude(br => br.BloodType)
-                                                  .Include(br => br.Event);
+                                                  .Include(br => br.Event)
+                                                  .Where(br => br.IsApproved == null);
 
             if (IsPhoneNumber(keyword))
             {
