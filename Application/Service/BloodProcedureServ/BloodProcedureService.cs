@@ -101,7 +101,7 @@ namespace Application.Service.BloodProcedureServ
             return apiResponse;
         }
 
-        public async Task<PaginatedResult<SearchBloodProcedureDTO>?> SearchBloodCollectionsByPhoneOrName(int pageNumber, int pageSize, string keyword, int? eventId = null)
+        public async Task<PaginatedResultWithEventTime<SearchBloodProcedureDTO>?> SearchBloodCollectionsByPhoneOrName(int pageNumber, int pageSize, string keyword, int? eventId = null)
         {
             var bloodCollections = await _repo.SearchBloodCollectionsByPhoneOrNameAsync(pageNumber, pageSize, keyword, eventId);
 
@@ -109,6 +109,8 @@ namespace Application.Service.BloodProcedureServ
             {
                 return null;
             }
+
+            var eventTime = bloodCollections.FirstOrDefault()?.BloodRegistration?.Event?.EventTime;
 
             var dto = bloodCollections.Select(bc => new SearchBloodProcedureDTO
             {
@@ -119,15 +121,22 @@ namespace Application.Service.BloodProcedureServ
                 BloodTypeName = bc.BloodRegistration.Member.BloodType?.Type,
                 PerformedAt = bc.PerformedAt,
                 IsQualified = bc.IsQualified,
-                EventTime = bc.BloodRegistration.Event?.EventTime
+                Phone = bc.BloodRegistration.Member.Phone
             }).ToList();
 
-            return new PaginatedResult<SearchBloodProcedureDTO>
+            var totalItems = await _repo.CountAsync(bp =>
+                                   (bp.BloodRegistration.Member.FirstName.Contains(keyword)
+                                   || bp.BloodRegistration.Member.LastName.Contains(keyword)
+                                   || bp.BloodRegistration.Member.Phone.Contains(keyword))
+                                   && bp.IsQualified == null);
+
+            return new PaginatedResultWithEventTime<SearchBloodProcedureDTO>
             {
-                Items = dto,
                 PageNumber = pageNumber,
                 PageSize = pageSize,
-                TotalItems = bloodCollections.Count
+                TotalItems = totalItems,
+                EventTime = eventTime,
+                Items = dto
             };
         }
 

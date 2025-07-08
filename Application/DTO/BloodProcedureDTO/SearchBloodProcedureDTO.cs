@@ -15,6 +15,6 @@ namespace Application.DTO.BloodProcedureDTO
         public string? BloodTypeName { get; set; }
         public DateTime PerformedAt { get; set; }
         public bool? IsQualified { get; set; }
-        public DateOnly? EventTime { get; set; }
+        public string Phone { get; set; }
     }
 }
