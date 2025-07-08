@@ -126,6 +126,8 @@ namespace Application.Service.VolunteerServ
                     Id = volunteer.Id,
                     BloodTypeName = bloodType?.Type,
                     Distance = Math.Round((decimal)GeographyHelper.CalculateDistanceKm(facility.Latitude, facility.Longitude, member.Latitude, member.Longitude), 1),
+                    StartVolunteerDate = volunteer.StartVolunteerDate,
+                    EndVolunteerDate = volunteer.EndVolunteerDate,
                     FullName = member.LastName + " " + member.FirstName,
                     Phone = member?.Phone,
                     Gmail = member?.Gmail
