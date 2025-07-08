@@ -17,7 +17,7 @@ namespace Infrastructure.Repository.BloodRegistrationRepo
             var today = DateOnly.FromDateTime(DateTime.Now);
             var expiredRegistrations = _context.BloodRegistrations
                 .Where(br => br.Event.EventTime < today &&
-                br.IsApproved == null || (br.IsApproved == true && br.BloodProcedureId == null))
+                (br.IsApproved == null || (br.IsApproved == true && br.BloodProcedureId == null)))
                 .ToListAsync();
 
             foreach (var expiredRegistration in expiredRegistrations.Result)
