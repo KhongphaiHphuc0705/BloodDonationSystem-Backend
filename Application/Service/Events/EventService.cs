@@ -191,7 +191,7 @@ namespace Application.Service.Events
 
         public async Task<PaginatedResult<EventDTO>> SearchEventByDayAsync(int pageNumber, int pageSize, DateOnly? startDay, DateOnly? endDay)
         {
-            var events = await _eventRepository.SearchEventByDayAsync(startDay, endDay);
+            var events = await _eventRepository.SearchEventByDayAsync(pageNumber, pageSize, startDay, endDay);
             var total = await _eventRepository.CountEventFromDayToDay(startDay, endDay);
 
             if (!events.Any())

@@ -172,7 +172,7 @@ namespace Infrastructure.Repository.Events
             //return totalCount;
         }
 
-        public async Task<List<Event>> SearchEventByDayAsync(DateOnly? startDay, DateOnly? endDay)
+        public async Task<List<Event>> SearchEventByDayAsync(int pageNumber, int pageSize, DateOnly? startDay, DateOnly? endDay)
         {
             return await _context.Events
                 .Include(e => e.BloodType)
