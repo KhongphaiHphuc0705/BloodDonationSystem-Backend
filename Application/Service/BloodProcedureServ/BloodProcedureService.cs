@@ -119,9 +119,9 @@ namespace Application.Service.BloodProcedureServ
             return apiResponse;
         }
 
-        public async Task<ApiResponse<BloodProcedure>?> UpdateBloodQualificationAsync(int regisId, RecordBloodQualification request)
+        public async Task<ApiResponse<RecordBloodQualification>?> UpdateBloodQualificationAsync(int regisId, RecordBloodQualification request)
         {
-            ApiResponse<BloodProcedure> apiResponse = new();
+            ApiResponse<RecordBloodQualification> apiResponse = new();
             // Kiểm tra đơn đăng ký hiến máu có được chấp nhận
             var bloodRegistration = await _repoRegis.GetByIdAsync(regisId);
             if (bloodRegistration == null || bloodRegistration.IsApproved == false)
@@ -168,6 +168,7 @@ namespace Application.Service.BloodProcedureServ
 
             apiResponse.IsSuccess = true;
             apiResponse.Message = "Blood qualification recorded successfully.";
+            apiResponse.Data = request;
             // Thêm máu vào kho nếu đủ điều kiện
             if (request.IsQualified == true)
             {

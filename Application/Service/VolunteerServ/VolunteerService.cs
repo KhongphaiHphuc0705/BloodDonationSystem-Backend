@@ -29,14 +29,14 @@ namespace Application.Service.VolunteerServ
             if (user == null)
                 throw new UnauthorizedAccessException("User not found or invalid");
 
-            // Nếu đã đăng ký tình nguyện thì không được đăng ký nữa
-            var checkedVolunteer = await _repoVolun.GetVolunteerByMemberIdAsync(creatorId);
-            if (checkedVolunteer != null)
-            {
-                apiResponse.IsSuccess = false;
-                apiResponse.Message = "Having a registered volunteer.";
-                return apiResponse;
-            }
+            //// Nếu đã đăng ký tình nguyện thì không được đăng ký nữa
+            //var checkedVolunteer = await _repoVolun.GetVolunteerByMemberIdAsync(creatorId);
+            //if (checkedVolunteer != null)
+            //{
+            //    apiResponse.IsSuccess = false;
+            //    apiResponse.Message = "Having a registered volunteer.";
+            //    return apiResponse;
+            //}
 
             // Kiểm tra đã hiến máu ở hệ thống lần nào chưa
             bool changedLastDonation = false;

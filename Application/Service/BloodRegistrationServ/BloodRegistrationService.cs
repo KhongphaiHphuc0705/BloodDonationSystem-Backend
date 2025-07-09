@@ -55,15 +55,15 @@ namespace Application.Service.BloodRegistrationServ
                 return null;
 
 
-            // Kiểm tra member chỉ được đăng ký hiến máu 1 lần vào 1 event 
-            var checkedRegis = _repository.GetByEventAsync(eventId).Result
-                .FirstOrDefault(br => br.MemberId == user.Id);
-            if (checkedRegis != null)
-            {
-                apiResponse.IsSuccess = false;
-                apiResponse.Message = "Already registered in this event.";
-                return apiResponse;
-            }
+            //// Kiểm tra member chỉ được đăng ký hiến máu 1 lần vào 1 event 
+            //var checkedRegis = _repository.GetByEventAsync(eventId).Result
+            //    .FirstOrDefault(br => br.MemberId == user.Id);
+            //if (checkedRegis != null)
+            //{
+            //    apiResponse.IsSuccess = false;
+            //    apiResponse.Message = "Already registered in this event.";
+            //    return apiResponse;
+            //}
 
             // Kiểm tra người dùng đã từng hiến máu ở hệ thống lần nào chưa
             bool changedLastDonation = false;
@@ -97,11 +97,26 @@ namespace Application.Service.BloodRegistrationServ
 
         }
 
-        public async Task<BloodRegistration?> RejectBloodRegistration(int bloodRegisId)
+        public async Task<ApiResponse<BloodRegistration>?> RejectBloodRegistration(int bloodRegisId)
         {
+            ApiResponse<BloodRegistration> apiResponse = new();
+
+            // Đơn đăng ký không tồn tại hoặc đã bị reject rồi thì thôi
             var bloodRegistration = await _repository.GetByIdAsync(bloodRegisId);
             if (bloodRegistration == null || bloodRegistration.IsApproved == false)
-                return null;
+            {
+                apiResponse.IsSuccess = false;
+                apiResponse.Message = "Blood registration not exist or be rejected before.";
+                return apiResponse;
+            }
+            
+            // Khi đã lấy máu rồi thì không được hủy nữa
+            if (bloodRegistration.BloodProcedureId != null)
+            {
+                apiResponse.IsSuccess = false;
+                apiResponse.Message = "Collected blood, so can't reject.";
+                return apiResponse;
+            }
 
             var userId = _contextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
             if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out Guid creatorId))
@@ -114,7 +129,9 @@ namespace Application.Service.BloodRegistrationServ
             bloodRegistration.StaffId = creatorId;
             await _repository.UpdateAsync(bloodRegistration);
             
-            return bloodRegistration;
+            apiResponse.IsSuccess = true;
+            apiResponse.Message = "Reject blood registration successfully.";
+            return apiResponse;
         }
 
         public async Task<ApiResponse<BloodRegistration>?> CancelOwnRegistration(int id)
