@@ -145,10 +145,11 @@ namespace Application.Service.Events
             return eventItem;
         }
 
-        public async Task<PaginatedResult<ListWaiting>> GetEventListDoBloodProcedure(int pageNumber, int pageSize)
+        public async Task<PaginatedResultWithEventTime<ListWaiting>> GetEventListDoBloodProcedure(int pageNumber, int pageSize)
         {
             var events = await _eventRepository.GetEventListDoBloodProcedure(pageNumber, pageSize);
             var totalItems = await _eventRepository.CountEventListDoBloodProcedure();
+            var eventTime = events.FirstOrDefault()?.EventTime;
 
             var dto = events.Select(e => new ListWaiting
             {
@@ -158,19 +159,21 @@ namespace Application.Service.Events
             }).Where(e => e.Total > 0)
               .ToList();
 
-            return new PaginatedResult<ListWaiting>
+            return new PaginatedResultWithEventTime<ListWaiting>
             {
                 TotalItems = totalItems,
-                Items = dto,
                 PageNumber = pageNumber,
-                PageSize = pageSize
+                PageSize = pageSize,
+                EventTime = eventTime,
+                Items = dto,
             };
         }
 
-        public async Task<PaginatedResult<ListWaiting>> GetPassedHealthProcedureAsync(int pageNumber, int pageSize)
+        public async Task<PaginatedResultWithEventTime<ListWaiting>> GetPassedHealthProcedureAsync(int pageNumber, int pageSize)
         {
             var events = await _eventRepository.GetPassedHealthProcedureAsync(pageNumber, pageSize);
             var totalItems = await _eventRepository.CountEventPassedHealthProcedureAsync();
+            var eventTime = events.FirstOrDefault()?.EventTime;
 
             var dto = events.Select(e => new ListWaiting
             {
@@ -180,9 +183,42 @@ namespace Application.Service.Events
             }).Where(e => e.Total > 0)
               .ToList();
 
-            return new PaginatedResult<ListWaiting>
+            return new PaginatedResultWithEventTime<ListWaiting>
             {
                 TotalItems = totalItems,
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                EventTime = eventTime,
+                Items = dto,
+            };
+        }
+
+        public async Task<PaginatedResult<EventDTO>> SearchEventByDayAsync(int pageNumber, int pageSize, DateOnly? startDay, DateOnly? endDay)
+        {
+            var events = await _eventRepository.SearchEventByDayAsync(pageNumber, pageSize, startDay, endDay);
+            var total = await _eventRepository.CountEventFromDayToDay(startDay, endDay);
+
+            if (!events.Any())
+            {
+                return null;
+            }
+
+            var dto = events.Select(e => new EventDTO
+            {
+                Id = e.Id,
+                Title = e.Title,
+                MaxOfDonor = e.MaxOfDonor,
+                EventTime = e.EventTime,
+                BloodType = e.BloodType?.Type,
+                BloodComponent = e.BloodComponent?.ToString(),
+                EstimatedVolume = e.EstimatedVolume,
+                IsUrgent = e.IsUrgent,
+                BloodRegisCount = e.BloodRegistrations.Count(),
+            }).ToList();
+
+            return new PaginatedResult<EventDTO>
+            {
+                TotalItems = total,
                 Items = dto,
                 PageNumber = pageNumber,
                 PageSize = pageSize

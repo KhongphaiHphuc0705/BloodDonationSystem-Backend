@@ -5,6 +5,7 @@ using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using MimeKit.Tnef;
 
 namespace BloodDonationSystem.Controllers
 {
@@ -65,6 +66,27 @@ namespace BloodDonationSystem.Controllers
                 return BadRequest(apiResponse);
 
             return Ok(apiResponse);
+        }
+
+        [Authorize(Roles = "Staff")]
+        [HttpGet("api/health-procedures/search")]
+        public async Task<IActionResult> SearchHealthProcedures([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string keyword = null, [FromQuery]int? eventId = null)
+        {
+            var healthProcedures = await _service.SearchHealthProceduresByPhoneOrNameAsync(pageNumber, pageSize, keyword, eventId);
+            if (healthProcedures == null || !healthProcedures.Items.Any())
+            {
+                return NotFound(new
+                {
+                    IsSuccess = false,
+                    Message = "No health procedures found."
+                });
+            }
+            return Ok(new
+            {
+                IsSuccess = true,
+                Message = "Health procedures retrieved successfully.",
+                Data = healthProcedures
+            });
         }
     }
 }

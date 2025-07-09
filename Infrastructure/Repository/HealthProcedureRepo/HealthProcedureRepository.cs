@@ -48,5 +48,42 @@ namespace Infrastructure.Repository.HealthProcedureRepo
                 .Include(hp => hp.BloodRegistration)
                 .FirstOrDefaultAsync(hp => hp.Id == id);
         }
+
+        public async Task<List<HealthProcedure>> SearchHealthProceduresByNameOrPhoneAsync(int pageNumber, int pageSize, string keyword, int? eventId = null)
+        {
+            IQueryable<HealthProcedure> query = _context.HealthProcedures
+                                            .Include(hp => hp.BloodRegistration)
+                                                .ThenInclude(br => br.Member)
+                                                .ThenInclude(m => m.BloodType)
+                                            .Include(hp => hp.BloodRegistration)
+                                                .ThenInclude(br => br.Event)
+                                            .Where(h => h.BloodRegistration.IsApproved == true && h.BloodRegistration.BloodProcedureId == null);
+
+            if (IsPhone(keyword))
+            {
+                query = query.Where(hp => hp.BloodRegistration.Member.Phone.Contains(keyword));
+            }
+            else
+            {
+                query = query.Where(hp => hp.BloodRegistration.Member.FirstName.Contains(keyword) 
+                || hp.BloodRegistration.Member.LastName.Contains(keyword));
+            }
+
+            if(eventId != null)
+            {
+                query = query.Where(hp => hp.BloodRegistration.EventId == eventId);
+            }
+
+            return await query
+                .OrderBy(hp => hp.PerformedAt)
+                .Skip(pageSize * (pageNumber - 1))
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
+        private bool IsPhone(string keyword)
+        {
+            return keyword.All(char.IsDigit);
+        }
     }
 }

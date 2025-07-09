@@ -16,6 +16,21 @@ namespace Infrastructure.Repository.VolunteerRepo
             _repoFacility = repoFacility;
         }
 
+        public async Task<int> EndVolunteerDateExpired()
+        {
+            var today = DateTime.Now;
+            var expiredVolunteers = _context.Volunteers
+                .Where(v => v.EndVolunteerDate < today)
+                .ToListAsync();
+
+            foreach(var expiredVolunteer in expiredVolunteers.Result)
+            {
+                expiredVolunteer.IsExpired = true;
+            }
+
+            return await _context.SaveChangesAsync();
+        }
+
         public async Task<PaginatedResult<Volunteer>> GetPagedAsync(int pageNumber, int pageSize)
         {
             // Hard code cho 1 cơ sở
