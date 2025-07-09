@@ -8,6 +8,7 @@ using Infrastructure.Repository.BloodProcedureRepo;
 using Infrastructure.Repository.BloodRegistrationRepo;
 using Infrastructure.Repository.Events;
 using Infrastructure.Repository.HealthProcedureRepo;
+using Infrastructure.Repository.Users;
 using Microsoft.AspNetCore.Http;
 
 namespace Application.Service.BloodProcedureServ
@@ -15,7 +16,7 @@ namespace Application.Service.BloodProcedureServ
     public class BloodProcedureService(IBloodProcedureRepository _repo, IBloodRegistrationRepository _repoRegis,
         IHealthProcedureRepository _repoHealth, IBloodInventoryRepository _repoInven,
         IHttpContextAccessor _contextAccessor, IEmailService _servEmail, 
-        IEventRepository _repoEvent) : IBloodProcedureService
+        IEventRepository _repoEvent, IUserRepository _repoUser) : IBloodProcedureService
     {
         public async Task<PaginatedResultBloodProce?> GetBloodCollectionsByPaged(int eventId, int pageNumber, int pageSize)
         {
@@ -42,6 +43,7 @@ namespace Application.Service.BloodProcedureServ
                     DonationRegisId = item.BloodRegistration.Id,
                     Volume = item.Volume,
                     FullName = item.BloodRegistration.Member.LastName + " " + item.BloodRegistration.Member.FirstName,
+                    Phone = item.BloodRegistration.Member.Phone,
                     BloodTypeName = item.BloodRegistration.Member.BloodType?.Type,
                     PerformedAt = item.PerformedAt,
                     IsQualified = item.IsQualified
@@ -72,6 +74,14 @@ namespace Application.Service.BloodProcedureServ
                 return apiResponse;
             }
 
+            // Lấy máu rồi thì không được lấy nữa
+            if (bloodRegistration.BloodProcedureId != null)
+            {
+                apiResponse.IsSuccess = false;
+                apiResponse.Message = "Already collected blood.";
+                return apiResponse;
+            }
+
             var userId = _contextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
             if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out Guid creatorId))
             {
@@ -87,6 +97,15 @@ namespace Application.Service.BloodProcedureServ
             };
             var bloodCollectionAdded = await _repo.AddAsync(bloodCollection);
 
+            // Update lại lần cuối hiến máu
+            var member = await _repoUser.GetUserByIdAsync(bloodRegistration.MemberId);
+            if (member == null)
+                throw new UnauthorizedAccessException("User not found or invalid");
+            var existedEvent = await _repoEvent.GetEventByIdAsync(bloodRegistration.EventId);
+            member.LastDonation = existedEvent?.EventTime.ToDateTime(TimeOnly.MinValue);
+            await _repoUser.UpdateUserProfileAsync(member);
+
+            // Update lại cho table BloodRegistrations
             bloodRegistration.BloodProcedureId = bloodCollectionAdded.Id;
             bloodRegistration.UpdateAt = DateTime.Now;
             bloodRegistration.StaffId = creatorId;
@@ -100,9 +119,9 @@ namespace Application.Service.BloodProcedureServ
             return apiResponse;
         }
 
-        public async Task<ApiResponse<BloodProcedure>?> UpdateBloodQualificationAsync(int regisId, RecordBloodQualification request)
+        public async Task<ApiResponse<RecordBloodQualification>?> UpdateBloodQualificationAsync(int regisId, RecordBloodQualification request)
         {
-            ApiResponse<BloodProcedure> apiResponse = new();
+            ApiResponse<RecordBloodQualification> apiResponse = new();
             // Kiểm tra đơn đăng ký hiến máu có được chấp nhận
             var bloodRegistration = await _repoRegis.GetByIdAsync(regisId);
             if (bloodRegistration == null || bloodRegistration.IsApproved == false)
@@ -121,12 +140,12 @@ namespace Application.Service.BloodProcedureServ
                 return apiResponse;
             }
 
-            var existingInventory = await _repoInven.GetByBloodRegisIdAsync(bloodRegistration.Id);
-            if (existingInventory != null)
+            // Không thể cập nhật nếu đã kiểm tra chất lượng máu
+            if (bloodProcedure.IsQualified != null)
             {
                 apiResponse.IsSuccess = false;
-                apiResponse.Message = "Blood unit is existed.";
-                return apiResponse; // Không thể cập nhật nếu đã có đơn vị máu trong kho
+                apiResponse.Message = "Already qualified this blood unit.";
+                return apiResponse;
             }
 
             var userId = _contextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
@@ -135,15 +154,21 @@ namespace Application.Service.BloodProcedureServ
                 throw new UnauthorizedAccessException("User not found or invalid");
             }
 
+            // Cập nhật thông tin kiểm tra chất lượng máu
             bloodProcedure.IsQualified = request.IsQualified;
+            bloodProcedure.HIV = request.HIV;
+            bloodProcedure.HCV = request.HCV;
+            bloodProcedure.Syphilis = request.Syphilis;
+            bloodProcedure.Hematocrit = request.Hematocrit;
             bloodProcedure.BloodTypeId = request.BloodTypeId;
             bloodProcedure.BloodComponent = request.BloodComponent;
             bloodProcedure.PerformedAt = DateTime.Now;
             bloodProcedure.PerformedBy = creatorId;
-            await _repo.UpdateAsync(bloodProcedure);  // Cập nhật thông tin kiểm tra chất lượng máu
+            await _repo.UpdateAsync(bloodProcedure);  
 
             apiResponse.IsSuccess = true;
             apiResponse.Message = "Blood qualification recorded successfully.";
+            apiResponse.Data = request;
             // Thêm máu vào kho nếu đủ điều kiện
             if (request.IsQualified == true)
             {

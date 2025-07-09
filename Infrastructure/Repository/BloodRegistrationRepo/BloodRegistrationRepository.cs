@@ -35,22 +35,32 @@ namespace Infrastructure.Repository.BloodRegistrationRepo
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<BloodRegistration>> GetByEventAsync(int eventId)
+        {
+            return await _dbSet
+                        .Where(br => br.EventId == eventId)
+                        .ToListAsync();           
+        }
+
         public async Task<PaginatedResult<BloodRegistration>> GetPagedAsync(int eventId, int pageNumber, int pageSize)
         {
-             var bloodRegistrations = await _dbSet
+            var bloodRegistrationsCount = await _dbSet
                                     .Include(br => br.Event)
-                                    .Where(br => br.EventId == eventId)
-                                    .OrderByDescending(e => e.CreateAt)
+                                    .Where(br => br.EventId == eventId && br.IsApproved == null)
+                                    .ToListAsync();
+
+            var bloodRegistrations = bloodRegistrationsCount
+                                    .OrderBy(e => e.CreateAt)
                                     .Skip(pageSize * (pageNumber - 1))
                                     .Take(pageSize)
-                                    .ToListAsync();
+                                    .ToList();
 
             var pagedResult = new PaginatedResult<BloodRegistration>
             {
                 Items = bloodRegistrations,
                 PageNumber = pageNumber,
                 PageSize = pageSize,
-                TotalItems = await _dbSet.CountAsync(br => br.EventId == eventId)
+                TotalItems = bloodRegistrationsCount.Count
             };
             return pagedResult;
         }
