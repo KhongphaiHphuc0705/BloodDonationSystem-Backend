@@ -12,6 +12,7 @@ namespace Infrastructure.Repository.BloodProcedureRepo
         {
         }
 
+        // Lấy list những đơn đăng ký mà chưa kiểm tra chất lượng máu
         public async Task<PaginatedResult<BloodProcedure>> GetBloodCollectionsByPagedAsync(int eventId, int pageNumber, int pageSize)
         {
             var bloodCollectionsByEvent = await _dbSet
@@ -19,12 +20,12 @@ namespace Infrastructure.Repository.BloodProcedureRepo
                     .ThenInclude(br => br.Event)
                 .Include(bc => bc.BloodRegistration)
                     .ThenInclude(br => br.Member)
-                .Where(bc => bc.BloodRegistration.EventId == eventId)
+                .Where(bc => bc.BloodRegistration.EventId == eventId &&
+                                bc.IsQualified == null)
                 .ToListAsync();
 
             var bloodCollections = bloodCollectionsByEvent
-                .OrderBy(bc => bc.IsQualified == null ? 0 : 1)
-                    .ThenBy(bc => bc.PerformedAt)
+                .OrderBy(bc => bc.PerformedAt)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToList();
@@ -77,29 +78,3 @@ namespace Infrastructure.Repository.BloodProcedureRepo
         }
     }
 }
-
-//var nullBloodCollections = await _dbSet
-//    .Include(bc => bc.BloodRegistration)
-//        .ThenInclude(br => br.Event)
-//    .Include(bc => bc.BloodRegistration)
-//        .ThenInclude(br => br.Member)
-//    .Where(bc => bc.BloodRegistration.EventId == eventId &&
-//                    bc.IsQualified == null)
-//    .OrderBy(bc => bc.PerformedAt)
-//    .Skip((pageNumber - 1) * pageSize)
-//    .Take(pageSize)
-//    .ToListAsync();
-
-//var notNullBloodCollections = await _dbSet
-//    .Include(bc => bc.BloodRegistration)
-//        .ThenInclude(br => br.Event)
-//    .Include(bc => bc.BloodRegistration)
-//        .ThenInclude(br => br.Member)
-//    .Where(bc => bc.BloodRegistration.EventId == eventId &&
-//                    bc.IsQualified != null)
-//    .OrderByDescending(bc => bc.PerformedAt)
-//    .Skip((pageNumber - 1) * pageSize)
-//    .Take(pageSize)
-//    .ToListAsync();
-
-//var bloodCollections = nullBloodCollections.Concat(notNullBloodCollections).ToList();
