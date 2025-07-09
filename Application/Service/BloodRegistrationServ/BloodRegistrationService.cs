@@ -248,7 +248,6 @@ namespace Application.Service.BloodRegistrationServ
                 MemberName = br.Member.LastName + " " + br.Member.FirstName,
                 Phone = br.Member.Phone,
                 Type = br.Member.BloodType.Type,
-                EventTime = br.Event.EventTime
             }).ToList();
 
             var totalItems = await _repository.CountAsync(br =>
