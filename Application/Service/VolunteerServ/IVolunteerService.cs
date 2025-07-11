@@ -12,5 +12,7 @@ namespace Application.Service.VolunteerServ
         Task<PaginatedResult<VolunteersResponse>?> GetVolunteersByPagedAsync(int facilityId, int pageNumber, int pageSize);
         //Task<ApiResponse<Volunteer>> AddDonationRegistrationWithVolunteerAsync(int eventId, int id);
         Task<ApiResponseFindDonors> AddDonationRegistrationWithVolunteersAsync(UrgentEventVolunteer urgentEventVolunteer);
+
+        Task<int> VolunteerEndDateExpiredAsync();
     }
 }

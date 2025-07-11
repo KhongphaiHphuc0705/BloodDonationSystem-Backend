@@ -274,5 +274,10 @@ namespace Application.Service.VolunteerServ
             apiResponse.Message = "Find donor(s) successfully.";
             return apiResponse;
         }
+
+        public async Task<int> VolunteerEndDateExpiredAsync()
+        {
+            return await _repoVolun.EndVolunteerDateExpired();
+        }
     }
 }

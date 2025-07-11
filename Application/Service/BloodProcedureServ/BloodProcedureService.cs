@@ -3,6 +3,7 @@ using Application.DTO.BloodProcedureDTO;
 using Application.Service.EmailServ;
 using Domain.Entities;
 using Domain.Enums;
+using Infrastructure.Helper;
 using Infrastructure.Repository.BloodInventoryRepo;
 using Infrastructure.Repository.BloodProcedureRepo;
 using Infrastructure.Repository.BloodRegistrationRepo;
@@ -119,6 +120,45 @@ namespace Application.Service.BloodProcedureServ
             return apiResponse;
         }
 
+        public async Task<PaginatedResultWithEventTime<SearchBloodProcedureDTO>?> SearchBloodCollectionsByPhoneOrName(int pageNumber, int pageSize, string keyword, int? eventId = null)
+        {
+            var bloodCollections = await _repo.SearchBloodCollectionsByPhoneOrNameAsync(pageNumber, pageSize, keyword, eventId);
+
+            if (bloodCollections == null || !bloodCollections.Any())
+            {
+                return null;
+            }
+
+            var eventTime = bloodCollections.FirstOrDefault()?.BloodRegistration?.Event?.EventTime;
+
+            var dto = bloodCollections.Select(bc => new SearchBloodProcedureDTO
+            {
+                Id = bc.Id,
+                DonationRegisId = bc.BloodRegistration.Id,
+                Volume = bc.Volume,
+                FullName = bc.BloodRegistration.Member.LastName + " " + bc.BloodRegistration.Member.FirstName,
+                BloodTypeName = bc.BloodRegistration.Member.BloodType?.Type,
+                PerformedAt = bc.PerformedAt,
+                IsQualified = bc.IsQualified,
+                Phone = bc.BloodRegistration.Member.Phone
+            }).ToList();
+
+            var totalItems = await _repo.CountAsync(bp =>
+                                   (bp.BloodRegistration.Member.FirstName.Contains(keyword)
+                                   || bp.BloodRegistration.Member.LastName.Contains(keyword)
+                                   || bp.BloodRegistration.Member.Phone.Contains(keyword))
+                                   && bp.IsQualified == null);
+
+            return new PaginatedResultWithEventTime<SearchBloodProcedureDTO>
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalItems = totalItems,
+                EventTime = eventTime,
+                Items = dto
+            };
+        }
+
         public async Task<ApiResponse<RecordBloodQualification>?> UpdateBloodQualificationAsync(int regisId, RecordBloodQualification request)
         {
             ApiResponse<RecordBloodQualification> apiResponse = new();
@@ -164,7 +204,7 @@ namespace Application.Service.BloodProcedureServ
             bloodProcedure.BloodComponent = request.BloodComponent;
             bloodProcedure.PerformedAt = DateTime.Now;
             bloodProcedure.PerformedBy = creatorId;
-            await _repo.UpdateAsync(bloodProcedure);  
+            await _repo.UpdateAsync(bloodProcedure);
 
             apiResponse.IsSuccess = true;
             apiResponse.Message = "Blood qualification recorded successfully.";
