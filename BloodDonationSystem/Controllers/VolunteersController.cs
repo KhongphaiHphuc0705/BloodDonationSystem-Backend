@@ -49,7 +49,7 @@ namespace BloodDonationSystem.Controllers
 
         [Authorize(Roles = "Staff")]
         [HttpGet("{facilityId}/paged")]
-        public async Task<IActionResult> GetVolunteersByPaged(int facilityId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        public async Task<IActionResult> GetVolunteersByPaged(int facilityId = 1, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
             var pagedVolunteer = await _service.GetVolunteersByPagedAsync(facilityId, pageNumber, pageSize);
             if (pagedVolunteer == null)
