@@ -46,7 +46,7 @@ namespace Application.Service.Events
                 throw new UnauthorizedAccessException("User not found or invalid");
             }
 
-            var bloodType = await _bloodRepository.GetBloodTypeByNameAsync(eventRequest.BloodType);
+            var bloodType = await _bloodRepository.GetBloodTypeByIdAsync(eventRequest.BloodTypeId);
 
             var events = new Event
             {

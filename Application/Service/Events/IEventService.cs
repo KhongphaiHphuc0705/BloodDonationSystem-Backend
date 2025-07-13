@@ -22,6 +22,5 @@ namespace Application.Service.Events
 
         Task<PaginatedResultWithEventTime<ListWaiting>> GetPassedHealthProcedureAsync(int pageNumber, int pageSize);
         Task<PaginatedResultWithEventTime<ListWaiting>> GetEventListDoBloodProcedure(int pageNumber, int pageSize);
-
     }
 }
