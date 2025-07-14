@@ -112,7 +112,6 @@ namespace Application.Service.BloodRegistrationServ
 
             // Đơn đăng ký không tồn tại hoặc đã bị reject rồi thì thôi
             var bloodRegistration = await _repository.GetByIdAsync(bloodRegisId);
-            await _servEmail.SendEmailRemindBloodDonation(bloodRegistration);
             if (bloodRegistration == null || bloodRegistration.IsApproved == false)
             {
                 apiResponse.IsSuccess = false;
